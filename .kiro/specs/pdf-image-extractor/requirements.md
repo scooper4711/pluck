@@ -16,6 +16,8 @@ image inside it for copying, dragging out, or exporting as WebP.
 ## R2 Page navigator
 - R2.1 The left-hand navigator lists every page of the PDF with a thumbnail.
 - R2.2 Pages are multi-selectable.
+- R2.4 Thumbnails fill the navigator's width, growing as it is widened, so a
+  page can be read beside its extracted text.
 - R2.3 With one page selected, the main view shows only the images on that
   page. With several pages selected it shows the images on those pages. With
   no page selected it shows every image in the document.

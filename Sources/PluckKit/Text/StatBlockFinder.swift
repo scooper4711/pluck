@@ -20,8 +20,8 @@ struct StatBlockRegion {
 /// capitals and then entries that each begin with a bold label.
 struct StatBlockFinder {
     private static let levelPattern = #"(LEVEL|CREATURE|HAZARD) ?[–−-]?\d+$"#
-    /// A gap taller than this many lines ends the block.
-    private static let maximumGap: CGFloat = 2.5
+    /// A gap taller than this share of a line ends the block: a blank line always does.
+    private static let maximumGap: CGFloat = 0.8
     private static let maximumDescriptionLines = 3
     private static let coreLabels = ["Perception", "AC", "HP", "Stealth", "Disable"]
 

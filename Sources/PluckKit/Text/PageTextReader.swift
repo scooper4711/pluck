@@ -169,7 +169,11 @@ private struct FragmentBuilder {
 
     mutating func add(_ character: StyledCharacter, frame: CGRect) {
         if startsNewFragment(frame) { endFragment() }
-        let isSpace = character.text.allSatisfy(\.isWhitespace)
+        // Layout marks such as a right-align tab come through as control characters (a backspace
+        // after a stat block's name, for one). They separate words, so they count as spaces.
+        let isSpace = character.text.unicodeScalars.allSatisfy {
+            CharacterSet.whitespaces.contains($0) || CharacterSet.controlCharacters.contains($0)
+        }
         if isSpace {
             if !characters.isEmpty, characters.last?.text != " " {
                 characters.append(StyledCharacter(text: " ", style: character.style))

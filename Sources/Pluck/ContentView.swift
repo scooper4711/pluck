@@ -13,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             PageSidebar(model: model)
-                .navigationSplitViewColumnWidth(min: 150, ideal: 190, max: 320)
+                .navigationSplitViewColumnWidth(min: 150, ideal: 190, max: 900)
         } detail: {
             detail
         }

@@ -36,7 +36,7 @@ read-only text view.
 `StatBlockFinder` runs before box and column analysis and claims each stat
 block's fragments, so that the rules dividing a block's sections are not taken
 for callouts. A block runs from its header down its column until a heading, a
-return to the body typeface, or a tall gap; lines in the block's typeface at
+return to the body typeface, or a blank line; lines in the block's typeface at
 the top of the next column are moved back into it. `StatBlockParser` splits
 the lines into entries: a bold label at the left edge opens one, as does a
 bold label pushed aside by an illustration, unless it is a label that only

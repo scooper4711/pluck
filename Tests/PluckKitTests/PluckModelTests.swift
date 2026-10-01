@@ -45,7 +45,7 @@ struct PluckModelTests {
         #expect(model.pageCount == 3 && model.scannedPageCount == 3)
         #expect(sizes == ["8x8", "2x1", "1x1"])
         #expect(model.library.imageCount(onPage: 2) == 1)
-        #expect(await model.pageThumbnail(at: 0)?.width == 200)
+        #expect(await model.pageThumbnail(at: 0)?.width == 320)
     }
 
     @Test("Selecting pages narrows the images shown to those pages")

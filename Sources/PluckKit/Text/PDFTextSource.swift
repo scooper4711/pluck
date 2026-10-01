@@ -122,10 +122,19 @@ struct DocumentProfile {
 
     /// True for headers, footers and page numbers, which are not part of the page's text.
     func isRunningElement(_ fragment: TextFragment, on pageSize: CGSize) -> Bool {
-        if runningKeys.contains(Self.key(for: fragment)) { return true }
+        if runningKeys.contains(Self.key(for: fragment)), Self.isInMargin(fragment.frame, of: pageSize) {
+            return true
+        }
         let isNumber = fragment.text.count <= 4 && fragment.text.allSatisfy(\.isNumber)
         let margin = pageSize.height * pageNumberMargin
         return isNumber && (fragment.frame.maxY < margin || fragment.frame.minY > pageSize.height - margin)
+    }
+
+    /// Headers, footers and side tabs sit at the edges of the page. Text repeated from page to
+    /// page inside the text area, such as a sidebar that recurs with every encounter, is content.
+    private static func isInMargin(_ frame: CGRect, of pageSize: CGSize) -> Bool {
+        frame.maxY < pageSize.height * 0.13 || frame.minY > pageSize.height * 0.9
+            || frame.maxX < pageSize.width * 0.16 || frame.minX > pageSize.width * 0.84
     }
 
     /// Words written with an internal hyphen, such as "mosquito-free".

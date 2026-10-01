@@ -18,7 +18,9 @@ that plain copy-and-paste from Preview or Acrobat loses.
   spanned. A word hyphenated at a line end is mended; a real hyphen is kept.
 - R2.5 Headings are recognised by type size, and bold and italic runs by the
   fonts the PDF actually uses.
-- R2.6 Running headers, footers and page numbers are left out.
+- R2.6 Running headers, footers and page numbers are left out. Text that
+  recurs inside the text area, such as a sidebar repeated with each encounter,
+  is kept.
 - R2.7 Text the PDF paints twice in the same place (outlined or shadowed
   type) is read once.
 - R2.8 Paizo's action glyphs are written as `pf2:` codes in Markdown and as
@@ -29,6 +31,7 @@ that plain copy-and-paste from Preview or Acrobat loses.
   `HAZARD n` header, trait boxes, bold-labelled entries) is recognised and kept
   as one block, including when it carries on in the next column or wraps
   around an illustration.
+- R4.5 A blank line ends a stat block, whatever follows it looks like.
 - R4.2 Markdown writes it as a `statblock` code block for the Obsidian plugin
   Fantasy Statblocks in its Basic Pathfinder 2e Layout, following the
   conventions of the user's vault (rarity in `rare_03`, alignment written as

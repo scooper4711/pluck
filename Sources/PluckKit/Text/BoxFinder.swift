@@ -101,7 +101,8 @@ struct BoxFinder {
     /// The area between two rules, if what it holds is one uniform passage. Rules that separate
     /// the rows of a list hold mixed text (a heading, then details) and are left alone.
     private func fencedArea(from top: CGRect, to bottom: CGRect, _ fragments: [TextFragment]) -> CGRect? {
-        let area = CGRect(x: top.minX, y: top.maxY, width: top.width, height: bottom.minY - top.maxY)
+        let span = top.union(bottom)
+        let area = CGRect(x: span.minX, y: top.maxY, width: span.width, height: bottom.minY - top.maxY)
         guard area.height >= Self.minimumSize.height, area.height <= pageSize.height * 0.6 else { return nil }
         return isUniform(fragments.filter { area.insetBy(dx: -2, dy: -2).contains($0.frame) }) ? area : nil
     }
@@ -123,9 +124,13 @@ struct BoxFinder {
         return fragments.allSatisfy { $0.style.family == style.family && abs($0.style.size - style.size) <= 0.6 }
     }
 
+    /// Two rules fence a passage when they line up at one end and mostly overlap. They need not
+    /// be the same length: a rule is cut short where an illustration intrudes.
     private func matches(_ rule: CGRect, _ other: CGRect) -> Bool {
-        abs(rule.minX - other.minX) <= Self.ruleTolerance && abs(rule.width - other.width) <= Self.ruleTolerance
-            && rule.minY > other.maxY
+        let sharesAnEdge = abs(rule.minX - other.minX) <= Self.ruleTolerance
+            || abs(rule.maxX - other.maxX) <= Self.ruleTolerance
+        let overlap = min(rule.maxX, other.maxX) - max(rule.minX, other.minX)
+        return sharesAnEdge && overlap >= min(rule.width, other.width) * 0.6 && rule.minY > other.maxY
     }
 
     private func smallestBox(containing fragment: TextFragment, in boxes: [LayoutBox]) -> Int? {

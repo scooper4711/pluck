@@ -119,6 +119,23 @@ struct TextBoxTests {
         ])
     }
 
+    @Test("A sidebar that recurs in the same place on several pages is content, not a running header")
+    func recurringSidebar() throws {
+        let words = ["Alpha", "Bravo", "Charlie", "Delta"]
+        let pages = words.map { word in
+            var page = Page()
+            page.lines(["\(word) opens this page", "with a sentence of its own."], x: Page.leftColumn, top: 300)
+            page.panel(x: Page.rightColumn - 8, top: 280, width: 220, height: 70)
+            page.line("ADJUSTING DIFFICULTY", x: Page.rightColumn, top: 300, font: .display, size: 12)
+            page.lines(["Add one creature to", "make the fight harder."], x: Page.rightColumn, top: 320)
+            return page
+        }
+        let blocks = try Page.blocks(of: pages)
+        #expect(blocks.allSatisfy { page in
+            page.last?.summary == "sidebar[h3:ADJUSTING DIFFICULTY | p:Add one creature to make the fight harder.]"
+        })
+    }
+
     @Test("A paragraph cut by a page break is rejoined; a finished one is not")
     func paragraphAcrossPages() {
         let cut: [[TextBlock]] = [[.paragraph([TextRun("The party heads")])], [.paragraph([TextRun("north at dawn.")])]]

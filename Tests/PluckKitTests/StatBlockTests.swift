@@ -192,6 +192,35 @@ struct StatBlockTests {
         #expect(block.entry(named: "AC")?.text == "20, Fort +10, Will +9")
     }
 
+    @Test("A blank line ends the stat block, even when the text after it looks like an entry")
+    func blankLineEndsBlock() throws {
+        let blocks = try Page.blocks { page in
+            let left = Page.leftColumn
+            page.line("CONVERTED KHEFAK", x: left, top: 100, font: .display, size: 12)
+            page.line("CREATURE 2", x: left + 150, top: 100, font: .display, size: 12)
+            page.line([("Perception", .display), (" +9; darkvision", .sans)], x: left, top: 114)
+            page.line([("AC", .display), (" 16", .sans)], x: left, top: 126)
+            page.line([("Impressed into Service:", .display), (" At the end of", .sans)], x: left + 9, top: 150)
+            page.line("each round a delegate helps.", x: left, top: 162, font: .sans)
+        }
+        #expect(blocks.map(\.summary) == [
+            "statblock:Converted Khefak", "p:Impressed into Service: At the end of each round a delegate helps."
+        ])
+    }
+
+    @Test("A control character left after the name by the layout is not kept")
+    func controlCharacterAfterName() throws {
+        let blocks = try Page.blocks { page in
+            page.lines(Self.bodyLines, x: Page.rightColumn, top: 100)
+            page.line("DOCKHAND\u{8}", x: Page.leftColumn, top: 100, font: .display, size: 12)
+            page.line("CREATURE 0", x: Page.leftColumn + 150, top: 100, font: .display, size: 12)
+            page.line([("Perception", .display), (" +3", .sans)], x: Page.leftColumn, top: 114)
+        }
+        guard case .statBlock(let block) = try #require(blocks.first) else { return }
+        #expect(block.name == "DOCKHAND")
+        #expect(TextRenderer(format: .html).render(blocks).unicodeScalars.allSatisfy { $0.value >= 0x20 || $0 == "\n" })
+    }
+
     @Test("An encounter roster shares the header line but is not a stat block")
     func encounterRoster() throws {
         let blocks = try Page.blocks { page in
