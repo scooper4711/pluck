@@ -27,11 +27,16 @@ that plain copy-and-paste from Preview or Acrobat loses.
   symbols (◆, ◆◆, ◆◆◆, ⤾, ◇) in HTML and plain text.
 
 ## R4 Pathfinder stat blocks
-- R4.1 A creature or hazard stat block (name and `LEVEL n` / `CREATURE n` /
-  `HAZARD n` header, trait boxes, bold-labelled entries) is recognised and kept
-  as one block, including when it carries on in the next column or wraps
+- R4.1 A stat block is recognised by its header line, in capitals: a name on
+  the left and a type and level on the right (`CREATURE 2`, `HAZARD 3`,
+  `OBSTACLE 1`, `LEVEL –1`). Creatures, hazards and chase obstacles are known
+  types; any other type counts when the header is underlined. Trait boxes and
+  bold-labelled entries follow. The block is kept as one, including when it carries on in the next column or wraps
   around an illustration.
 - R4.5 A blank line ends a stat block, whatever follows it looks like.
+- R4.6 Text without a label, after a rule or at the left edge, is the block's
+  description (a chase obstacle's flavour text, or "Variant pirate") and is
+  kept as an unlabelled entry, including when it starts the next column.
 - R4.2 Markdown writes it as a `statblock` code block for the Obsidian plugin
   Fantasy Statblocks in its Basic Pathfinder 2e Layout, following the
   conventions of the user's vault (rarity in `rare_03`, alignment written as

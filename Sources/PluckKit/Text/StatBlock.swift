@@ -56,7 +56,7 @@ public struct StatBlock: Equatable, Sendable {
         let offenseStart = entries.firstIndex { $0.name == "Speed" } ?? entries.count
         let middleEnd = max(defenseStart, offenseStart)
         return [Array(entries[..<defenseStart]), Array(entries[defenseStart..<middleEnd]),
-                Array(entries[middleEnd...])].filter { !$0.isEmpty }
+                Array(entries[middleEnd...])]
     }
 
     public func entry(named name: String) -> Entry? {

@@ -50,4 +50,4 @@ so every colour space, mask type and nesting case is exercised deterministically
 - `Sources/PluckKit` — extraction, de-duplication, edits, encoding, export and the `PluckModel`.
 - `Sources/Pluck` — the SwiftUI/AppKit shell.
 - `scripts/make-icon.sh` — regenerates the icon from `scripts/make-icon.swift`.
-- `.kiro/specs/pdf-image-extractor` — requirements, design and known limits.
+- `docs/specs` — requirements and design, with known limits, for images and for text.

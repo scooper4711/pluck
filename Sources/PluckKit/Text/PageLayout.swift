@@ -13,7 +13,7 @@ struct PageLayout {
     func flow(fragments: [TextFragment], panels: [CGRect], rules: [CGRect]) -> [FlowElement] {
         // Stat blocks are claimed first: the rules inside them divide sections, not callouts.
         let finder = StatBlockFinder(body: body)
-        let (regions, rest) = finder.partition(fragments)
+        let (regions, rest) = finder.partition(fragments, rules: rules)
         let otherRules = rules.filter { rule in
             !regions.contains { $0.frame.insetBy(dx: -4, dy: -4).intersects(rule) }
         }
@@ -25,14 +25,16 @@ struct PageLayout {
     private func absorbingContinuations(_ elements: [FlowElement], finder: StatBlockFinder) -> [FlowElement] {
         var result: [FlowElement] = []
         for element in elements {
-            guard case .lines(let lines) = element, case .statBlock(var region) = result.last else {
+            // A box at the head of the next column does not interrupt the block that flows past it.
+            let target = result.lastIndex { if case .box = $0 { false } else { true } }
+            guard case .lines(let lines) = element, let target, case .statBlock(var region) = result[target] else {
                 result.append(element)
                 continue
             }
-            let continuation = Array(lines.prefix { finder.continues(region, with: $0) })
+            let continuation = Array(lines.prefix(finder.continuationLength(of: region, in: lines)))
             if !continuation.isEmpty {
                 region.segments.append(continuation)
-                result[result.count - 1] = .statBlock(region)
+                result[target] = .statBlock(region)
             }
             if continuation.count < lines.count { result.append(.lines(Array(lines.dropFirst(continuation.count)))) }
         }

@@ -21,7 +21,7 @@ enum StatBlockWriter {
             let items = block.traits.map { "<li>\(escape(traitName($0)))</li>" }
             lines += ["<ul class=\"traits\">"] + items + ["</ul>"]
         }
-        for (index, section) in block.sections.enumerated() {
+        for (index, section) in block.sections.filter({ !$0.isEmpty }).enumerated() {
             if index > 0 { lines.append("<hr>") }
             lines += section.map { entry in
                 let label = entry.name.isEmpty ? "" : "<strong>\(escape(entry.name))</strong> "
@@ -54,7 +54,9 @@ struct StatBlockYAMLWriter {
         "LE": ["lawful", "evil"], "NE": ["evil"], "CE": ["chaotic", "evil"]
     ]
     /// Entries that have a field of their own rather than a place in an abilities list.
-    private static let dedicated: Set<String> = ["Perception", "Languages", "Skills", "Str", "AC", "HP", "Speed"]
+    private static let dedicated: Set<String> = [
+        "Perception", "Stealth", "Languages", "Skills", "Str", "AC", "HP", "Speed"
+    ]
 
     let block: StatBlock
 
@@ -95,6 +97,10 @@ struct StatBlockYAMLWriter {
         if let perception = block.entry(named: "Perception") {
             if let modifier = Self.numbers(in: perception.text).first { lines.append("modifier: \(modifier)") }
             lines += ["perception:"] + item(name: "Perception", desc: inline(perception.runs))
+        } else if let stealth = block.entry(named: "Stealth") {
+            // A hazard is noticed against its Stealth, which takes Perception's place.
+            if let modifier = Self.numbers(in: stealth.text).first { lines.append("modifier: \(modifier)") }
+            lines += ["perception:", "  - name: \"\""] + item(name: "Stealth", desc: inline(stealth.runs))
         }
         if let languages = block.entry(named: "Languages") { lines.append("languages: \(quoted(languages.text))") }
         if let skills = block.entry(named: "Skills") {
@@ -125,11 +131,14 @@ struct StatBlockYAMLWriter {
     /// The entries without a field of their own, in the layout's three lists: before the
     /// defences, between them and Speed, and after Speed.
     private var abilities: [String] {
-        let sections = block.sections
+        var sections = block.sections + [[], [], []]
+        // A hazard's Disable entry is printed before its defences but belongs with them.
+        sections[1] = sections[0].filter { $0.name == "Disable" } + sections[1]
+        sections[0].removeAll { $0.name == "Disable" }
         let keys = ["abilities_top", "abilities_mid", "attacks"]
         var lines: [String] = []
         for (index, key) in keys.enumerated() {
-            let entries = (index < sections.count ? sections[index] : []).filter { !Self.dedicated.contains($0.name) }
+            let entries = sections[index].filter { !Self.dedicated.contains($0.name) }
             lines += ["\(key):", "  - name: \"\""]
             lines += entries.flatMap { key == "attacks" ? attack($0) : ability($0) }
         }

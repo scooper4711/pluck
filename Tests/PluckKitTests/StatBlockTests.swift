@@ -67,7 +67,7 @@ struct StatBlockTests {
             "Perception", "Languages", "Skills", "Str", "Items", "AC", "HP", "Speed", "Melee"
         ])
         #expect(block.entry(named: "Melee")?.text == "[one-action] shortsword +9 (agile), Damage 1d6-1 piercing")
-        #expect(block.sections.map { $0.map(\.name) } == [
+        #expect(block.sections.filter { !$0.isEmpty }.map { $0.map(\.name) } == [
             ["Perception", "Languages", "Skills", "Str", "Items"], ["AC", "HP"], ["Speed", "Melee"]
         ])
     }

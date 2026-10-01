@@ -51,8 +51,15 @@ line into pieces. The tokens become `pf2:` codes in Markdown and symbols in
 HTML and plain text.
 
 An encounter roster ("DOCKHAND (2) … CREATURE 0", a page reference, an
-initiative) has the same header as a stat block; a block must contain one of
-Perception, AC, HP, Stealth or Disable to count.
+initiative) has the same header as a stat block; a block of a known type must
+contain one of Perception, AC, HP, Stealth, Disable or Chase Points to count.
+A header of an unknown type must be underlined instead.
+
+The rules inside a block divide its sections, so unlabelled text straight
+after one starts a description entry rather than continuing the entry above.
+When the document's body text shares the stat blocks' typeface, a block is
+only continued into the next column if it was visibly cut off: it ended on a
+rule or in mid-sentence. The continuation then runs to the first blank line.
 
 ## Overprinted text
 

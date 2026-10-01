@@ -170,9 +170,11 @@ private struct FragmentBuilder {
     mutating func add(_ character: StyledCharacter, frame: CGRect) {
         if startsNewFragment(frame) { endFragment() }
         // Layout marks such as a right-align tab come through as control characters (a backspace
-        // after a stat block's name, for one). They separate words, so they count as spaces.
+        // after a stat block's name, for one), and glyphs the PDF gives no meaning to, such as the
+        // dot leaders of a contents page, as U+FFFD. Both only separate words, so count as spaces.
         let isSpace = character.text.unicodeScalars.allSatisfy {
             CharacterSet.whitespaces.contains($0) || CharacterSet.controlCharacters.contains($0)
+                || $0 == "\u{FFFD}"
         }
         if isSpace {
             if !characters.isEmpty, characters.last?.text != " " {
