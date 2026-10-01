@@ -10,6 +10,7 @@ A native macOS utility that opens a PDF and offers up every image inside it.
   intact (soft masks, stencil masks, colour-key masks), not re-rendered.
 - **No duplicates** — an image repeated across pages (borders, backgrounds)
   is shown once, labelled with how many pages use it.
+- **Several PDFs at once** — each in its own window, with File ▸ Open Recent.
 - **Multi-select** — click, ⌘/⇧-click, rubber-band or ⌘A.
 - **Rotate and flip** — ⌘L / ⌘R and the Image menu; edits carry through to
   whatever leaves the app.

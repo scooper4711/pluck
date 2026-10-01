@@ -57,6 +57,20 @@ guarded by a lock, so they can be called synchronously from drag callbacks and
 from detached tasks. `PluckModel` is `@MainActor` and scans one page per
 detached task so the UI fills in progressively.
 
+## Windows
+
+`WindowGroup(for: URL.self)` gives one window per PDF, each with its own
+`PluckModel`; SwiftUI brings the existing window forward when a URL is opened
+twice. Every open request (File ▸ Open, Open Recent, Finder, a drop) goes
+through `DocumentRouter`: whichever window sees the pending URLs first opens a
+window for each. The empty window shown at launch closes as soon as any
+document window exists. File-open events are taken from the app delegate, not
+SwiftUI's `onOpenURL`, which loses files when several arrive together.
+
+`RecentDocuments` backs File ▸ Open Recent with the system recent-documents
+list (so the Dock menu shows them too) but keeps its own ordered copy, because
+the system list updates late.
+
 ## UI
 
 `NavigationSplitView`: a SwiftUI `List` of pages (multi-select) and an

@@ -9,6 +9,9 @@ image inside it for copying, dragging out, or exporting as WebP.
 - R1.2 A password-protected PDF prompts for its password.
 - R1.3 A file that is not a readable PDF reports an error instead of failing
   silently.
+- R1.4 Several PDFs can be open at once, each in its own window, as in
+  Preview. Opening a PDF that is already open brings its window forward.
+- R1.5 File ▸ Open Recent lists recently opened PDFs and can be cleared.
 
 ## R2 Page navigator
 - R2.1 The left-hand navigator lists every page of the PDF with a thumbnail.
@@ -30,6 +33,8 @@ image inside it for copying, dragging out, or exporting as WebP.
 - R4.1 Images whose decoded pixels are identical are shown once, however
   many pages or PDF objects they appear in (e.g. page-border decorations).
 - R4.2 A de-duplicated image belongs to every page it appears on.
+- R4.3 Only exact matches count. Images that merely look alike (re-encoded,
+  resized or cropped copies) are different images and are all shown.
 
 ## R5 Selection and editing
 - R5.1 Images are multi-selectable (click, ⌘/⇧-click, rubber band, ⌘A).

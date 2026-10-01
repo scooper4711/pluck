@@ -2,27 +2,38 @@ import PluckKit
 import SwiftUI
 
 struct PluckCommands: Commands {
-    let actions: AppActions
+    let router: DocumentRouter
+    @ObservedObject var recents: RecentDocuments
+    /// The frontmost document window's commands; `nil` when no document window has focus.
+    @FocusedValue(\.documentActions) private var actions
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
-            Button("Open…", action: actions.chooseDocument)
+            Button("Open…") { router.open(DocumentPanel.choosePDFs()) }
                 .keyboardShortcut("o")
+            Menu("Open Recent") {
+                ForEach(recents.urls, id: \.self) { url in
+                    Button(url.lastPathComponent) { router.open([url]) }
+                }
+                Divider()
+                Button("Clear Menu", action: recents.clear)
+                    .disabled(recents.urls.isEmpty)
+            }
         }
         CommandGroup(replacing: .importExport) {
-            Button("Export Selected…", action: actions.exportSelection)
+            Button("Export Selected…") { actions?.exportSelection() }
                 .keyboardShortcut("e")
-            Button("Export All Shown…", action: actions.exportVisible)
+            Button("Export All Shown…") { actions?.exportVisible() }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
         }
         CommandMenu("Image") {
-            Button("Rotate Left") { actions.apply(.rotateLeft) }
+            Button("Rotate Left") { actions?.apply(.rotateLeft) }
                 .keyboardShortcut("l")
-            Button("Rotate Right") { actions.apply(.rotateRight) }
+            Button("Rotate Right") { actions?.apply(.rotateRight) }
                 .keyboardShortcut("r")
             Divider()
-            Button("Flip Horizontal") { actions.apply(.flipHorizontal) }
-            Button("Flip Vertical") { actions.apply(.flipVertical) }
+            Button("Flip Horizontal") { actions?.apply(.flipHorizontal) }
+            Button("Flip Vertical") { actions?.apply(.flipVertical) }
         }
     }
 }
