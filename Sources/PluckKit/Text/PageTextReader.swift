@@ -1,0 +1,146 @@
+import CoreGraphics
+import Foundation
+import PDFKit
+
+/// Reads a page's characters and positions from PDFKit, gives each its real font from the
+/// page's drawing commands, and groups them into fragments.
+struct PageTextReader {
+    /// Text smaller than this is hidden production marking, not content.
+    private static let minimumSize: CGFloat = 4
+    private static let maximumSize: CGFloat = 400
+    /// PDFKit's character boxes are about this many times the font size tall.
+    private static let lineHeightFactor: CGFloat = 1.2
+    /// A gap wider than this share of the line height separates two fragments.
+    private static let gapFactor: CGFloat = 0.7
+
+    let page: PDFPage
+    let graphics: PageGraphics
+
+    private let cropBox: CGRect
+    private let spanIndex: FontSpanIndex
+
+    init(page: PDFPage, graphics: PageGraphics) {
+        self.page = page
+        self.graphics = graphics
+        cropBox = page.bounds(for: .cropBox)
+        spanIndex = FontSpanIndex(graphics.fontSpans)
+    }
+
+    /// Converts a rectangle from PDF page coordinates to reading coordinates.
+    func readingRect(_ rect: CGRect) -> CGRect {
+        CGRect(x: rect.minX - cropBox.minX, y: cropBox.maxY - rect.maxY, width: rect.width, height: rect.height)
+    }
+
+    func fragments() -> [TextFragment] {
+        guard let string = page.string as NSString? else { return [] }
+        var builder = FragmentBuilder(gapFactor: Self.gapFactor)
+        var index = 0
+        while index < string.length {
+            let range = string.rangeOfComposedCharacterSequence(at: index)
+            index = range.upperBound
+            let text = string.substring(with: range)
+            if text.unicodeScalars.allSatisfy(CharacterSet.newlines.contains) {
+                builder.endFragment()
+            } else if let frame = page.selection(for: range)?.bounds(for: page), isSensible(frame) {
+                add(text, frame: frame, to: &builder)
+            }
+        }
+        builder.endFragment()
+        return builder.fragments
+    }
+
+    /// PDFKit occasionally reports an empty, infinite or page-sized box for a character.
+    private func isSensible(_ frame: CGRect) -> Bool {
+        !frame.isEmpty && !frame.isInfinite && frame.height <= Self.maximumSize * 2
+            && cropBox.insetBy(dx: -cropBox.width, dy: -cropBox.height).contains(frame)
+    }
+
+    private func add(_ text: String, frame: CGRect, to builder: inout FragmentBuilder) {
+        let style = spanIndex.style(at: frame) ?? fallbackStyle(for: frame)
+        guard style.size >= Self.minimumSize else { return }
+        builder.add(StyledCharacter(text: text, style: style), frame: readingRect(frame))
+    }
+
+    /// For a character no drawing command covers, only its size can be told, from its box.
+    /// PDFKit's own styled text is not consulted: building it hangs on some pages.
+    private func fallbackStyle(for frame: CGRect) -> CharacterStyle {
+        CharacterStyle(fontName: "", size: frame.height / Self.lineHeightFactor, isBold: false, isItalic: false)
+    }
+}
+
+/// Finds the font span under a character quickly, by bucketing spans on their baseline.
+private struct FontSpanIndex {
+    private var spansByBaseline: [Int: [FontSpan]] = [:]
+
+    init(_ spans: [FontSpan]) {
+        for span in spans where span.isHorizontal {
+            spansByBaseline[Int(span.start.y.rounded(.down)), default: []].append(span)
+        }
+    }
+
+    /// The style of the span whose baseline runs through the character's box (page coordinates).
+    func style(at frame: CGRect) -> CharacterStyle? {
+        let expectedBaseline = frame.minY + frame.height * 0.2
+        var best: (span: FontSpan, distance: CGFloat)?
+        for bucket in Int(frame.minY.rounded(.down)) - 1...Int(frame.maxY.rounded(.up)) {
+            for span in spansByBaseline[bucket] ?? [] where covers(span, frame) {
+                let distance = abs(span.start.y - expectedBaseline)
+                if distance < best?.distance ?? .infinity { best = (span, distance) }
+            }
+        }
+        return best.map {
+            CharacterStyle(fontName: $0.span.fontName, size: $0.span.size, isBold: $0.span.isBold,
+                           isItalic: $0.span.isItalic)
+        }
+    }
+
+    private func covers(_ span: FontSpan, _ frame: CGRect) -> Bool {
+        span.start.y >= frame.minY - 1 && span.start.y <= frame.maxY
+            && frame.midX >= span.start.x - 1 && frame.midX <= span.end.x + 1
+    }
+}
+
+/// Accumulates characters into fragments, starting a new one at a line break or a wide gap.
+private struct FragmentBuilder {
+    let gapFactor: CGFloat
+    private(set) var fragments: [TextFragment] = []
+
+    private var characters: [StyledCharacter] = []
+    /// The box of the visible characters; trailing spaces are not counted.
+    private var inkFrame = CGRect.null
+    private var lastFrame = CGRect.null
+
+    init(gapFactor: CGFloat) {
+        self.gapFactor = gapFactor
+    }
+
+    mutating func add(_ character: StyledCharacter, frame: CGRect) {
+        if startsNewFragment(frame) { endFragment() }
+        let isSpace = character.text.allSatisfy(\.isWhitespace)
+        if isSpace {
+            if !characters.isEmpty, characters.last?.text != " " {
+                characters.append(StyledCharacter(text: " ", style: character.style))
+            }
+        } else {
+            characters.append(character)
+            inkFrame = inkFrame.union(frame)
+        }
+        lastFrame = frame
+    }
+
+    mutating func endFragment() {
+        while characters.last?.text == " " { characters.removeLast() }
+        if !characters.isEmpty { fragments.append(TextFragment(frame: inkFrame, characters: characters)) }
+        characters = []
+        inkFrame = .null
+        lastFrame = .null
+    }
+
+    private func startsNewFragment(_ frame: CGRect) -> Bool {
+        guard !lastFrame.isNull else { return false }
+        let height = min(frame.height, lastFrame.height)
+        let changesBaseline = abs(frame.minY - lastFrame.minY) > height * 0.5
+        let gap = frame.minX - lastFrame.maxX
+        return changesBaseline || gap > height * gapFactor || gap < -height
+    }
+}
