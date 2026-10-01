@@ -70,7 +70,7 @@ struct PDFArray {
     }
 }
 
-struct PDFDictionary {
+struct PDFDictionary: Hashable {
     let ref: CGPDFDictionaryRef
 
     /// Returns the value under the first key present. Inline images abbreviate their keys
