@@ -25,10 +25,10 @@ final class PDFBuilder {
     }
 
     /// Adds a page with the given resource dictionary entries and content stream.
-    func addPage(resources: String, content: Data) {
+    func addPage(resources: String, content: Data, mediaBox: String = "0 0 200 200") {
         let contentID = addStream("", data: content)
         pageIDs.append(addObject("""
-            << /Type /Page /Parent \(Self.pageTreeID) 0 R /MediaBox [0 0 200 200] \
+            << /Type /Page /Parent \(Self.pageTreeID) 0 R /MediaBox [\(mediaBox)] \
             /Resources << \(resources) >> /Contents \(contentID) 0 R >>
             """))
     }

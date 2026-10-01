@@ -6,12 +6,14 @@ struct ContentView: View {
     let actions: AppActions
 
     @AppStorage("thumbnailSize") private var thumbnailSize = 180.0
+    /// Read here so that changing the setting redraws the text.
+    @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
     @State private var password = ""
 
     var body: some View {
         NavigationSplitView {
             PageSidebar(model: model)
-                .navigationSplitViewColumnWidth(min: 150, ideal: 190, max: 320)
+                .navigationSplitViewColumnWidth(min: 150, ideal: 190, max: 900)
         } detail: {
             detail
         }
@@ -41,8 +43,23 @@ struct ContentView: View {
             ContentUnavailableView("Couldn’t Open the PDF", systemImage: "exclamationmark.triangle",
                                    description: Text(message))
         case .scanning, .ready:
-            imageGrid
+            switch model.mode {
+            case .images: imageGrid
+            case .text: textOutput
+            }
         }
+    }
+
+    private var textOutput: some View {
+        textView
+            .id(usesObsidianCallouts)
+            .overlay {
+                if !model.isLoadingText, model.visibleText.isEmpty {
+                    ContentUnavailableView("No Text", systemImage: "text.alignleft",
+                                           description: Text("Nothing to show for the selected pages."))
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
     }
 
     private var imageGrid: some View {
@@ -56,6 +73,15 @@ struct ContentView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
+    }
+
+    /// HTML is shown rendered; the other formats are shown as the text they are.
+    @ViewBuilder private var textView: some View {
+        if model.textFormat == .html {
+            HTMLPreviewView(markup: model.visibleText)
+        } else {
+            TextOutputView(text: model.visibleText)
+        }
     }
 
     private var isAskingForPassword: Binding<Bool> {
@@ -81,11 +107,11 @@ private struct StatusBar: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(summary)
-            if model.phase == .scanning {
-                ProgressView(value: Double(model.scannedPageCount), total: Double(max(model.pageCount, 1)))
+            Text(model.mode == .images ? imageSummary : textSummary)
+            if let progress {
+                ProgressView(value: Double(progress.done), total: Double(max(model.pageCount, 1)))
                     .frame(width: 120)
-                Text("Scanning page \(model.scannedPageCount) of \(model.pageCount)")
+                Text("\(progress.label) page \(progress.done) of \(model.pageCount)")
             }
             Spacer()
             Text(model.statusMessage)
@@ -97,10 +123,24 @@ private struct StatusBar: View {
         .background(.bar)
     }
 
-    private var summary: String {
+    /// The work still running for the mode on show, if any.
+    private var progress: (label: String, done: Int)? {
+        switch model.mode {
+        case .images: model.phase == .scanning ? ("Scanning", model.scannedPageCount) : nil
+        case .text: model.isLoadingText ? ("Reading", model.pageTexts.count) : nil
+        }
+    }
+
+    private var imageSummary: String {
         var parts = ["\(model.visibleImages.count) images"]
         if !model.selectedImages.isEmpty { parts.append("\(model.selectedImages.count) selected") }
         if model.library.failureCount > 0 { parts.append("\(model.library.failureCount) unreadable") }
         return parts.joined(separator: " · ")
+    }
+
+    private var textSummary: String {
+        let pages = model.visibleTextPageCount
+        let words = model.visibleText.split { $0.isWhitespace }.count
+        return "\(pages) \(pages == 1 ? "page" : "pages") · \(words) words · \(model.textFormat.displayName)"
     }
 }

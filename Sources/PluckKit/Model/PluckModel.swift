@@ -6,6 +6,16 @@ import Observation
 @MainActor
 @Observable
 public final class PluckModel {
+    /// What the main view shows: the PDF's images, or its text.
+    public enum Mode: String, CaseIterable, Identifiable, Sendable {
+        case images
+        case text
+
+        public var id: String { rawValue }
+    }
+
+    public static let textFormatDefaultsKey = "textFormat"
+
     public enum Phase: Equatable {
         case empty
         case scanning
@@ -29,14 +39,27 @@ public final class PluckModel {
     /// Hides images whose longest side is shorter than this many pixels.
     public var minimumDimension = 0
 
+    public var mode = Mode.images {
+        didSet { if mode == .text { Task { await loadText() } } }
+    }
+    public var textFormat: TextFormat {
+        didSet { defaults.set(textFormat.rawValue, forKey: Self.textFormatDefaultsKey) }
+    }
+    /// The text of each page extracted so far, by page index.
+    public private(set) var pageTexts: [Int: [TextBlock]] = [:]
+    public private(set) var isLoadingText = false
+
     @ObservationIgnored private var source: PDFImageSource?
     @ObservationIgnored private var thumbnailer: PDFPageThumbnailer?
     /// Bumped on every open so a superseded scan can tell it should stop.
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private let defaults: UserDefaults
 
+    @ObservationIgnored private var password = ""
+
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        textFormat = defaults.string(forKey: Self.textFormatDefaultsKey).flatMap(TextFormat.init) ?? .markdown
     }
 
     // MARK: - Derived state
@@ -54,6 +77,39 @@ public final class PluckModel {
         transforms[image.id] ?? .identity
     }
 
+    /// The pages whose text is shown: the selected ones, or all of them, in page order.
+    public var textPageIndexes: [Int] {
+        selectedPages.isEmpty ? Array(0..<pageCount) : selectedPages.sorted()
+    }
+
+    /// The text of the shown pages as blocks. Paragraphs cut by a page break are rejoined
+    /// where the pages are consecutive.
+    public var visibleTextBlocks: [TextBlock] {
+        var runs: [[[TextBlock]]] = []
+        var previousIndex: Int?
+        for index in textPageIndexes {
+            guard let blocks = pageTexts[index] else { continue }
+            if let previousIndex, index == previousIndex + 1 {
+                runs[runs.count - 1].append(blocks)
+            } else {
+                runs.append([blocks])
+            }
+            previousIndex = index
+        }
+        return runs.flatMap(TextFlow.join)
+    }
+
+    /// The text of the shown pages in the chosen format, one line per paragraph.
+    public var visibleText: String {
+        TextRenderer(format: textFormat, options: TextRenderOptions(defaults: defaults)).render(visibleTextBlocks)
+    }
+
+    /// A file name for exported text, such as `Scenario.md`.
+    public var textFileName: String {
+        let stem = documentURL?.deletingPathExtension().lastPathComponent ?? "text"
+        return "\(stem).\(textFormat.fileExtension)"
+    }
+
     // MARK: - Opening
 
     /// Opens a PDF and scans every page; returns once scanning finishes or is superseded.
@@ -68,8 +124,10 @@ public final class PluckModel {
             }.value
             guard openGeneration == generation else { return }
             (source, thumbnailer) = opened
+            self.password = password
             pageCount = opened.0.pageCount
             phase = .scanning
+            if mode == .text { Task { await loadText() } }
             await scanPages(of: opened.0, generation: openGeneration)
         } catch PluckError.passwordRequired {
             phase = .passwordRequired(url)
@@ -83,6 +141,22 @@ public final class PluckModel {
         return await Task.detached {
             try? thumbnailer.thumbnail(ofPageAt: pageIndex, maximumDimension: maximumDimension)
         }.value
+    }
+
+    /// Extracts the text of every page, a page at a time. Returns when done or superseded;
+    /// calling it again once started does nothing.
+    public func loadText() async {
+        guard let url = documentURL, source != nil, !isLoadingText, pageTexts.isEmpty else { return }
+        isLoadingText = true
+        let loadGeneration = generation
+        let password = password
+        let textSource = try? await Task.detached { try PDFTextSource(url: url, password: password) }.value
+        for pageIndex in 0..<(textSource?.pageCount ?? 0) {
+            let blocks = await Task.detached { textSource?.blocks(forPageAt: pageIndex) ?? [] }.value
+            guard loadGeneration == generation else { return }
+            pageTexts[pageIndex] = blocks
+        }
+        if loadGeneration == generation { isLoadingText = false }
     }
 
     // MARK: - Editing
@@ -113,6 +187,23 @@ public final class PluckModel {
         statusMessage = "Copied \(Self.count(encoded.count, "image"))"
     }
 
+    /// Puts the shown text on the pasteboard as a plain string in the chosen format.
+    public func copyText(to pasteboard: NSPasteboard = .general) {
+        pasteboard.clearContents()
+        pasteboard.setString(visibleText, forType: .string)
+        statusMessage = "Copied text of \(Self.count(visibleTextPageCount, "page"))"
+    }
+
+    public func exportText(to url: URL) throws {
+        try visibleText.write(to: url, atomically: true, encoding: .utf8)
+        statusMessage = "Exported text to “\(url.lastPathComponent)”"
+    }
+
+    /// How many of the shown pages have had their text extracted.
+    public var visibleTextPageCount: Int {
+        textPageIndexes.count { pageTexts[$0] != nil }
+    }
+
     /// The exporter configured from the user's WebP settings.
     public var exporter: ImageExporter {
         ImageExporter(options: WebPOptions(defaults: defaults))
@@ -135,6 +226,8 @@ public final class PluckModel {
         selectedPages = []
         selectedImageIDs = []
         statusMessage = ""
+        pageTexts = [:]
+        isLoadingText = false
         source = nil
         thumbnailer = nil
     }

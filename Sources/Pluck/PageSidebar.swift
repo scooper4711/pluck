@@ -5,11 +5,20 @@ import SwiftUI
 struct PageSidebar: View {
     @Bindable var model: PluckModel
 
+    /// The pixel size thumbnails are drawn at, stepped so that dragging the divider does not
+    /// redraw every page at every width.
+    @State private var thumbnailPixels = 400
+
     var body: some View {
         List(selection: $model.selectedPages) {
             ForEach(0..<model.pageCount, id: \.self) { pageIndex in
-                PageRow(model: model, pageIndex: pageIndex)
+                PageRow(model: model, pageIndex: pageIndex, thumbnailPixels: thumbnailPixels)
             }
+        }
+        .onGeometryChange(for: Int.self) { proxy in
+            Self.thumbnailPixels(forWidth: proxy.size.width)
+        } action: { pixels in
+            thumbnailPixels = pixels
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !model.selectedPages.isEmpty {
@@ -23,16 +32,32 @@ struct PageSidebar: View {
     }
 }
 
+extension PageSidebar {
+    private static let pixelStep = 400.0
+
+    /// Enough pixels for a portrait page filling the sidebar on a Retina display.
+    static func thumbnailPixels(forWidth width: CGFloat) -> Int {
+        let needed = width * 2 * 1.45
+        return Int(min(2400, max(pixelStep, (needed / pixelStep).rounded(.up) * pixelStep)))
+    }
+}
+
 private struct PageRow: View {
     let model: PluckModel
     let pageIndex: Int
+    let thumbnailPixels: Int
 
     @State private var thumbnail: CGImage?
 
+    private struct ThumbnailRequest: Equatable {
+        let document: URL?
+        let pixels: Int
+    }
+
     var body: some View {
         VStack(spacing: 4) {
+            // No fixed height: the preview is as wide as the sidebar allows and as tall as that makes it.
             preview
-                .frame(height: 150)
                 .frame(maxWidth: .infinity)
             Text("Page \(pageIndex + 1)")
                 .font(.callout)
@@ -41,8 +66,8 @@ private struct PageRow: View {
                 .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
-        .task(id: model.documentURL) {
-            thumbnail = await model.pageThumbnail(at: pageIndex)
+        .task(id: ThumbnailRequest(document: model.documentURL, pixels: thumbnailPixels)) {
+            thumbnail = await model.pageThumbnail(at: pageIndex, maximumDimension: thumbnailPixels) ?? thumbnail
         }
     }
 

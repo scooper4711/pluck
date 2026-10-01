@@ -37,7 +37,11 @@ public final class PDFPageThumbnailer: @unchecked Sendable {
             let canvas = CGRect(origin: .zero, size: size)
             context.setFillColor(.white)
             context.fill(canvas)
-            context.concatenate(page.getDrawingTransform(.cropBox, rect: canvas, rotate: 0, preserveAspectRatio: true))
+            // The drawing transform only ever shrinks a page, so enlarging is done separately.
+            let pageSize = Self.displaySize(of: page)
+            context.scaleBy(x: size.width / pageSize.width, y: size.height / pageSize.height)
+            context.concatenate(page.getDrawingTransform(
+                .cropBox, rect: CGRect(origin: .zero, size: pageSize), rotate: 0, preserveAspectRatio: true))
             context.drawPDFPage(page)
             guard let image = context.makeImage() else {
                 throw PluckError.renderingFailed(operation: "drawing page \(index + 1)")
@@ -46,10 +50,16 @@ public final class PDFPageThumbnailer: @unchecked Sendable {
         }
     }
 
+    /// The page scaled, up or down, so that its longer side is `maximumDimension` pixels.
     private static func fittedSize(of page: CGPDFPage, maximumDimension: CGFloat) -> CGSize {
-        var box = page.getBoxRect(.cropBox).size
-        if page.rotationAngle % 180 != 0 { box = CGSize(width: box.height, height: box.width) }
-        let scale = min(1, maximumDimension / max(box.width, box.height, 1))
+        let box = displaySize(of: page)
+        let scale = maximumDimension / max(box.width, box.height, 1)
         return CGSize(width: max(1, (box.width * scale).rounded()), height: max(1, (box.height * scale).rounded()))
+    }
+
+    /// The crop box as displayed, with the page's rotation applied.
+    private static func displaySize(of page: CGPDFPage) -> CGSize {
+        let box = page.getBoxRect(.cropBox).size
+        return page.rotationAngle % 180 == 0 ? box : CGSize(width: box.height, height: box.width)
     }
 }

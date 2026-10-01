@@ -32,14 +32,33 @@ struct AppActions {
         perform { try await model.copySelection() }
     }
 
+    /// Export in whichever mode is showing: the selected images, or the text.
     func exportSelection() {
+        guard model.mode == .images else { return exportText() }
         guard !model.selectedImages.isEmpty, let directory = chooseExportDirectory() else { return }
         perform { try await model.exportSelection(to: directory) }
     }
 
     func exportVisible() {
+        guard model.mode == .images else { return exportText() }
         guard !model.visibleImages.isEmpty, let directory = chooseExportDirectory() else { return }
         perform { try await model.exportVisible(to: directory) }
+    }
+
+    func copyText() {
+        model.copyText()
+    }
+
+    func exportText() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = model.textFileName
+        panel.allowedContentTypes = [UTType(filenameExtension: model.textFormat.fileExtension) ?? .plainText]
+        guard !model.visibleText.isEmpty, panel.runModal() == .OK, let url = panel.url else { return }
+        perform { try model.exportText(to: url) }
+    }
+
+    func show(_ mode: PluckModel.Mode) {
+        model.mode = mode
     }
 
     private func chooseExportDirectory() -> URL? {
