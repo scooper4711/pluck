@@ -26,6 +26,13 @@ struct PluckCommands: Commands {
             Button("Export All Shown…") { actions?.exportVisible() }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
         }
+        CommandGroup(before: .sidebar) {
+            Button("Images") { actions?.show(.images) }
+                .keyboardShortcut("1")
+            Button("Text") { actions?.show(.text) }
+                .keyboardShortcut("2")
+            Divider()
+        }
         CommandMenu("Image") {
             Button("Rotate Left") { actions?.apply(.rotateLeft) }
                 .keyboardShortcut("l")
@@ -41,6 +48,7 @@ struct PluckCommands: Commands {
 struct SettingsView: View {
     @AppStorage(WebPOptions.losslessDefaultsKey) private var isLossless = false
     @AppStorage(WebPOptions.qualityDefaultsKey) private var quality = WebPOptions.defaultQuality
+    @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
 
     var body: some View {
         Form {
@@ -51,6 +59,12 @@ struct SettingsView: View {
                 }
                 .disabled(isLossless)
                 Text("Transparency is always kept. Lossless files are exact but much larger for photos.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Text") {
+                Toggle("Write Markdown info boxes as Obsidian callouts", isOn: $usesObsidianCallouts)
+                Text("Off: a plain block quote. On: “> [!info] Title”, and “> [!quote]” for read-aloud text.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }

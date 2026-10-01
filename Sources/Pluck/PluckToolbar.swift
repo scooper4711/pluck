@@ -13,6 +13,23 @@ struct PluckToolbar: ToolbarContent {
             Button("Open", systemImage: "folder", action: actions.chooseDocuments)
                 .help("Open a PDF")
         }
+        ToolbarItem(placement: .principal) {
+            Picker("Mode", selection: $model.mode) {
+                Label("Images", systemImage: "photo.on.rectangle").tag(PluckModel.Mode.images)
+                Label("Text", systemImage: "text.alignleft").tag(PluckModel.Mode.text)
+            }
+            .pickerStyle(.segmented)
+            .labelStyle(.titleAndIcon)
+            .help("Show the PDF's images or its text")
+        }
+        if model.mode == .images {
+            imageTools
+        } else {
+            textTools
+        }
+    }
+
+    @ToolbarContentBuilder private var imageTools: some ToolbarContent {
         ToolbarItemGroup {
             editButton("Rotate Left", systemImage: "rotate.left", edit: .rotateLeft)
             editButton("Rotate Right", systemImage: "rotate.right", edit: .rotateRight)
@@ -44,6 +61,25 @@ struct PluckToolbar: ToolbarContent {
             Slider(value: $thumbnailSize, in: 96...360)
                 .frame(width: 110)
                 .help("Thumbnail size")
+        }
+    }
+
+    @ToolbarContentBuilder private var textTools: some ToolbarContent {
+        ToolbarItemGroup {
+            Picker("Format", selection: $model.textFormat) {
+                ForEach(TextFormat.allCases) { format in
+                    Text(format.displayName).tag(format)
+                }
+            }
+            .help("The markup the text is written in")
+        }
+        ToolbarItemGroup {
+            Button("Copy All", systemImage: "doc.on.doc", action: actions.copyText)
+                .help("Copy all the text shown; select text and press ⌘C to copy part of it")
+                .disabled(model.visibleText.isEmpty)
+            Button("Export", systemImage: "square.and.arrow.up", action: actions.exportText)
+                .help("Save the text shown as a file")
+                .disabled(model.visibleText.isEmpty)
         }
     }
 
