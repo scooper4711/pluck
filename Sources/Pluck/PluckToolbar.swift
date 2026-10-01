@@ -75,7 +75,7 @@ struct PluckToolbar: ToolbarContent {
         }
         ToolbarItemGroup {
             Button("Copy All", systemImage: "doc.on.doc", action: actions.copyText)
-                .help("Copy all the text shown; select text and press ⌘C to copy part of it")
+                .help("Copy all the text shown, as markup; select text and press ⌘C to copy part of it")
                 .disabled(model.visibleText.isEmpty)
             Button("Export", systemImage: "square.and.arrow.up", action: actions.exportText)
                 .help("Save the text shown as a file")

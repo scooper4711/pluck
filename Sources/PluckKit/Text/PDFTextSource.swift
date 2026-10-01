@@ -10,6 +10,8 @@ public final class PDFTextSource: @unchecked Sendable {
     private static let pageNumberMargin: CGFloat = 0.08
 
     public let pageCount: Int
+    /// The PDF's own title, when it has a meaningful one. Many only repeat a file name.
+    public let title: String?
 
     private let document: PDFDocument
     private let graphicsDocument: CGPDFDocument
@@ -24,6 +26,11 @@ public final class PDFTextSource: @unchecked Sendable {
         else { throw PluckError.cannotOpenDocument(url) }
         self.document = document
         pageCount = document.pageCount
+        let declaredTitle = document.documentAttributes?[PDFDocumentAttribute.titleAttribute] as? String
+        title = declaredTitle.flatMap { title in
+            let looksLikeFileName = title.range(of: #"\.[A-Za-z]{3,4}$"#, options: .regularExpression) != nil
+            return title.isEmpty || looksLikeFileName ? nil : title
+        }
     }
 
     /// The page's text as headings, paragraphs, list items and boxes, in reading order.
@@ -43,8 +50,9 @@ public final class PDFTextSource: @unchecked Sendable {
         let fragments = content.fragments.filter { !profile.isRunningElement($0, on: content.size) }
         let flow = PageLayout(pageSize: content.size, body: profile.body)
             .flow(fragments: fragments, panels: content.panels, rules: content.rules)
-        return ParagraphBuilder(body: profile.body, obstacles: content.images, compounds: profile.compounds)
-            .blocks(from: flow)
+        return ParagraphBuilder(
+            body: profile.body, obstacles: content.images, compounds: profile.compounds, source: title
+        ).blocks(from: flow)
     }
 
     private func documentProfile() -> DocumentProfile {

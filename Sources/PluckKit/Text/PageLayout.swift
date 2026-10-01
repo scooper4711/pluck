@@ -11,7 +11,32 @@ struct PageLayout {
     let body: BodyStyle
 
     func flow(fragments: [TextFragment], panels: [CGRect], rules: [CGRect]) -> [FlowElement] {
-        flow(of: BoxFinder(pageSize: pageSize, body: body).partition(fragments, panels: panels, rules: rules))
+        // Stat blocks are claimed first: the rules inside them divide sections, not callouts.
+        let finder = StatBlockFinder(body: body)
+        let (regions, rest) = finder.partition(fragments)
+        let otherRules = rules.filter { rule in
+            !regions.contains { $0.frame.insetBy(dx: -4, dy: -4).intersects(rule) }
+        }
+        let items = BoxFinder(pageSize: pageSize, body: body).partition(rest, panels: panels, rules: otherRules)
+        return absorbingContinuations(flow(of: items + regions.map(LayoutItem.statBlock)), finder: finder)
+    }
+
+    /// Moves the lines that carry a stat block on into the next column back into the block.
+    private func absorbingContinuations(_ elements: [FlowElement], finder: StatBlockFinder) -> [FlowElement] {
+        var result: [FlowElement] = []
+        for element in elements {
+            guard case .lines(let lines) = element, case .statBlock(var region) = result.last else {
+                result.append(element)
+                continue
+            }
+            let continuation = Array(lines.prefix { finder.continues(region, with: $0) })
+            if !continuation.isEmpty {
+                region.segments.append(continuation)
+                result[result.count - 1] = .statBlock(region)
+            }
+            if continuation.count < lines.count { result.append(.lines(Array(lines.dropFirst(continuation.count)))) }
+        }
+        return result
     }
 
     private func flow(of items: [LayoutItem]) -> [FlowElement] {
@@ -36,6 +61,9 @@ struct PageLayout {
                 let length = box.fragments.reduce(0) { $0 + $1.characters.count }
                 let isCaption = box.kind == .sidebar && length <= Self.captionLength
                 elements += isCaption ? inner : [.box(box.kind, inner)]
+            case .statBlock(let region):
+                flushLines()
+                elements.append(.statBlock(region))
             }
         }
         flushLines()

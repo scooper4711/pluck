@@ -51,7 +51,7 @@ struct ContentView: View {
     }
 
     private var textOutput: some View {
-        TextOutputView(text: model.visibleText)
+        textView
             .id(usesObsidianCallouts)
             .overlay {
                 if !model.isLoadingText, model.visibleText.isEmpty {
@@ -73,6 +73,15 @@ struct ContentView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
+    }
+
+    /// HTML is shown rendered; the other formats are shown as the text they are.
+    @ViewBuilder private var textView: some View {
+        if model.textFormat == .html {
+            HTMLPreviewView(markup: model.visibleText)
+        } else {
+            TextOutputView(text: model.visibleText)
+        }
     }
 
     private var isAskingForPassword: Binding<Bool> {

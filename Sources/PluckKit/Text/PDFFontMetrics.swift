@@ -1,4 +1,5 @@
 import CoreGraphics
+import CoreText
 import Foundation
 
 /// The parts of a PDF font needed to follow text across a page: its real name, which says whether
@@ -32,7 +33,8 @@ final class PDFFontMetrics {
         } else {
             // Type 3 fonts measure glyphs in their own space rather than in thousandths.
             let scale = subtype == "Type3" ? font.object("FontMatrix")?.array?[0]?.number ?? 0.001 : 0.001
-            widths = Self.simpleWidths(font, scale: scale)
+            let declared = Self.simpleWidths(font, scale: scale)
+            widths = declared.isEmpty ? Self.systemWidths(forFontNamed: name) : declared
             fallbackWidth = descriptor?.object("MissingWidth")?.number.map { $0 * scale }
                 ?? (name.contains("Courier") ? Self.monospacedWidth : Self.defaultWidth)
         }
@@ -59,6 +61,22 @@ final class PDFFontMetrics {
         guard let first = font.object("FirstChar")?.integer, let list = font.object("Widths")?.array?.numbers
         else { return [:] }
         return Dictionary(uniqueKeysWithValues: list.enumerated().map { (first + $0.offset, $0.element * scale) })
+    }
+
+    /// Widths for a font that declares none, which the standard fonts (Helvetica, Times, Courier)
+    /// are allowed to do: measured from the system's font of the same name, if it has one.
+    private static func systemWidths(forFontNamed name: String) -> [Int: CGFloat] {
+        let unitsPerEm: CGFloat = 1000
+        let font = CTFontCreateWithName(name as CFString, unitsPerEm, nil)
+        guard CTFontCopyPostScriptName(font) as String == name else { return [:] }
+        var widths: [Int: CGFloat] = [:]
+        for code in 32...255 {
+            var character = UniChar(code)
+            var glyph = CGGlyph(0)
+            guard CTFontGetGlyphsForCharacters(font, &character, &glyph, 1) else { continue }
+            widths[code] = CTFontGetAdvancesForGlyphs(font, .horizontal, &glyph, nil, 1) / unitsPerEm
+        }
+        return widths
     }
 
     /// A composite font's `W` array mixes two forms: `first [w1 w2 …]` and `first last w`.

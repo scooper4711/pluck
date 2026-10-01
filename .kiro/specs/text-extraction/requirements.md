@@ -20,8 +20,27 @@ that plain copy-and-paste from Preview or Acrobat loses.
   fonts the PDF actually uses.
 - R2.6 Running headers, footers and page numbers are left out.
 
+## R4 Pathfinder stat blocks
+- R4.1 A creature or hazard stat block (name and `LEVEL n` / `CREATURE n` /
+  `HAZARD n` header, trait boxes, bold-labelled entries) is recognised and kept
+  as one block, including when it carries on in the next column or wraps
+  around an illustration.
+- R4.2 Markdown writes it as a `statblock` code block for the Obsidian plugin
+  Fantasy Statblocks in its Basic Pathfinder 2e Layout, following the
+  conventions of the user's vault (rarity in `rare_03`, alignment written as
+  traits, strikes titled `**Melee** \`pf2:1\` Weapon`).
+- R4.3 HTML writes it as `div.statblock` with a heading, a trait list, a
+  paragraph per entry and a rule between sections. Plain text lists the
+  entries one per line.
+- R4.4 In an organised-play scenario the subtier named by the heading above
+  is appended to the name, as in `Gwibble (1-2)`.
+
 ## R3 Output
 - R3.1 Three formats: plain text, Markdown, HTML.
 - R3.2 Any selection of the text can be copied; Copy All copies everything
   shown; Export saves it as `.txt`, `.md` or `.html`.
 - R3.3 Markdown info boxes can optionally be written as Obsidian callouts.
+- R3.4 In HTML an info box is a `div` with class `callout`; read-aloud text is
+  a `blockquote`.
+- R3.5 The HTML format is shown rendered, not as markup. Copying, whether all
+  of it or a selection, still copies the markup.

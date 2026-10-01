@@ -88,6 +88,7 @@ extension TextBlock {
         case .paragraph(let runs): "p:\(runs.map(\.text).joined())"
         case .listItem(let runs): "li:\(runs.map(\.text).joined())"
         case .box(let box): "\(box.kind)[\(box.blocks.map(\.summary).joined(separator: " | "))]"
+        case .statBlock(let block): "statblock:\(block.displayName)"
         }
     }
 }

@@ -96,6 +96,7 @@ private enum PlainTextWriter {
             case .heading(_, let runs), .paragraph(let runs): runs.text
             case .listItem(let runs): "• " + runs.text
             case .box(let box): render(box.blocks)
+            case .statBlock(let statBlock): StatBlockWriter.plainText(statBlock)
             }
         }
     }
@@ -116,6 +117,7 @@ private struct MarkdownWriter {
             case .paragraph(let runs): protectingLineStart(inline(runs))
             case .listItem(let runs): "- " + inline(runs)
             case .box(let box): quote(box)
+            case .statBlock(let statBlock): StatBlockYAMLWriter(block: statBlock).render()
             }
         }
     }
@@ -188,12 +190,13 @@ private enum HTMLWriter {
         case .paragraph(let runs), .listItem(let runs):
             "<p>" + inline(runs) + "</p>"
         case .box(let box):
-            wrap(render(box.blocks), in: box.kind == .sidebar ? "aside" : "blockquote")
+            // An info box is a `div.callout`; read-aloud text is a quotation.
+            box.kind == .sidebar
+                ? "<div class=\"callout\">\n\(render(box.blocks))\n</div>"
+                : "<blockquote>\n\(render(box.blocks))\n</blockquote>"
+        case .statBlock(let statBlock):
+            StatBlockWriter.html(statBlock, inline: inline)
         }
-    }
-
-    private static func wrap(_ content: String, in tag: String) -> String {
-        "<\(tag)>\n\(content)\n</\(tag)>"
     }
 
     private static func inline(_ runs: [TextRun]) -> String {

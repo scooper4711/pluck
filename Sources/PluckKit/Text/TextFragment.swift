@@ -60,4 +60,5 @@ indirect enum FlowElement {
     /// Consecutive lines of one column, top to bottom.
     case lines([TextFragment])
     case box(TextBox.Kind, [FlowElement])
+    case statBlock(StatBlockRegion)
 }

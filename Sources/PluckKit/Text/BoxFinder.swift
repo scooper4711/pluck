@@ -12,11 +12,13 @@ struct LayoutBox {
 enum LayoutItem {
     case fragment(TextFragment)
     case box(LayoutBox)
+    case statBlock(StatBlockRegion)
 
     var frame: CGRect {
         switch self {
         case .fragment(let fragment): fragment.frame
         case .box(let box): box.frame
+        case .statBlock(let region): region.frame
         }
     }
 }

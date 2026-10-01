@@ -21,6 +21,8 @@ struct ParagraphBuilder {
     var obstacles: [CGRect] = []
     /// Hyphenated words seen whole in the document, lower-cased: their hyphens are real.
     var compounds: Set<String> = []
+    /// The document's title, recorded on each stat block as its source.
+    var source: String?
 
     func blocks(from flow: [FlowElement]) -> [TextBlock] {
         var blocks: [TextBlock] = []
@@ -28,6 +30,11 @@ struct ParagraphBuilder {
         var openParagraph: Int?
         for element in flow {
             switch element {
+            case .statBlock(let region):
+                var statBlock = StatBlockParser(isCompound: isCompound).parse(region)
+                statBlock.variant = subtier(in: blocks)
+                statBlock.source = source
+                blocks.append(.statBlock(statBlock))
             case .box(let kind, let inner):
                 let box = TextBlock.box(TextBox(kind: kind, blocks: self.blocks(from: inner)))
                 // A callout that runs from the foot of one column to the head of the next is one passage.
@@ -42,6 +49,17 @@ struct ParagraphBuilder {
             }
         }
         return blocks
+    }
+
+    /// The subtier named by the nearest heading above, as in "Encounter F (Subtier 1–2)".
+    private func subtier(in blocks: [TextBlock]) -> String? {
+        for block in blocks.reversed() {
+            guard case .heading(_, let runs) = block,
+                  let match = runs.text.range(of: #"Subtier \d+[–-]\d+"#, options: .regularExpression)
+            else { continue }
+            return runs.text[match].dropFirst("Subtier ".count).replacingOccurrences(of: "–", with: "-")
+        }
+        return nil
     }
 
     private func append(_ lines: [TextFragment], to blocks: inout [TextBlock], openParagraph: inout Int?) {

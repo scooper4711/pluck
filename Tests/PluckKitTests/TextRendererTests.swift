@@ -86,10 +86,10 @@ struct TextRendererTests {
             <li>Tymon</li>
             <li>Shimmerford</li>
             </ul>
-            <aside>
+            <div class="callout">
             <h3>WHERE ON GOLARION?</h3>
             <p>In the River Kingdoms.</p>
-            </aside>
+            </div>
             <blockquote>
             <p>“Thank goodness you came!”</p>
             </blockquote>

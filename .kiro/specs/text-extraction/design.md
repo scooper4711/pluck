@@ -31,6 +31,27 @@ read-only text view.
    lead-in. Indents and short lines beside an illustration are discounted.
    A paragraph left open at the foot of a column rejoins its continuation.
 
+## Stat blocks
+
+`StatBlockFinder` runs before box and column analysis and claims each stat
+block's fragments, so that the rules dividing a block's sections are not taken
+for callouts. A block runs from its header down its column until a heading, a
+return to the body typeface, or a tall gap; lines in the block's typeface at
+the top of the next column are moved back into it. `StatBlockParser` splits
+the lines into entries: a bold label at the left edge opens one, as does a
+bold label pushed aside by an illustration, unless it is a label that only
+occurs inside entries (`Damage`, `Fort`, `Cantrips`, a spell level).
+`StatBlockYAMLWriter` maps entries onto the Fantasy Statblocks fields.
+
+Paizo's action glyphs arrive from PDFKit as `[one-action]` and similar; they
+become `pf2:` codes in YAML and ◆ symbols elsewhere.
+
+## HTML preview
+
+The app shows HTML in a `WKWebView` (`HTMLPreviewView`) wrapped in a page that
+supplies display-only styling. A `copy` handler in that page replaces the
+pasteboard contents with the selection's own markup.
+
 `DocumentProfile` samples pages once for what is true of the whole document:
 the body font, text repeated in the same place (running headers and footers),
 and hyphenated compounds seen unbroken, whose hyphens are therefore real.
@@ -40,6 +61,11 @@ and hyphenated compounds seen unbroken, whose hyphens are therefore real.
 
 ## Known limits
 
+- A stat block that carries on over a page break loses its tail to ordinary
+  paragraphs, and some blocks that wrap tightly around art lose entries.
+- Hazards use the creature layout's fields; the plugin has a separate hazard
+  layout that is not targeted.
+- The `source` field is only filled when the PDF declares a real title.
 - Tables come out as lines or columns of text, not as tables.
 - A callout is only found when rules fence it; a sidebar only when something
   is drawn behind or around it.

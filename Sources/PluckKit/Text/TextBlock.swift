@@ -38,12 +38,13 @@ public indirect enum TextBlock: Equatable, Sendable {
     case paragraph([TextRun])
     case listItem([TextRun])
     case box(TextBox)
+    case statBlock(StatBlock)
 
-    /// The block's text without styling; a box has none of its own.
+    /// The block's text without styling; a box or stat block has none of its own.
     public var plainText: String {
         switch self {
         case .heading(_, let runs), .paragraph(let runs), .listItem(let runs): runs.map(\.text).joined()
-        case .box: ""
+        case .box, .statBlock: ""
         }
     }
 }
