@@ -94,6 +94,22 @@ struct TextLayoutTests {
         #expect(blocks.first?.summary == "p:The villagers were terrified of the well-known witch.")
     }
 
+    @Test("Text painted twice for an outline or shadow is read once")
+    func overprintedText() throws {
+        let blocks = try Page.blocks { page in
+            for offset in [0, 0] as [CGFloat] {
+                page.line("A Theft in Riddleport", x: Page.leftColumn + offset, top: 80, size: 24)
+            }
+            for offset in [0, 1] as [CGFloat] {
+                page.line("A caption with a soft shadow, all good.", x: Page.leftColumn + offset, top: 120 + offset)
+            }
+            page.line("Add odd boots, see?", x: Page.leftColumn, top: 150)
+        }
+        #expect(blocks.map(\.summary) == [
+            "h1:A Theft in Riddleport", "p:A caption with a soft shadow, all good.", "p:Add odd boots, see?"
+        ])
+    }
+
     @Test("Bold and italic runs are recovered from the fonts")
     func emphasis() throws {
         let blocks = try Page.blocks { page in

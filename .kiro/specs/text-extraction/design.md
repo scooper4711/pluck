@@ -43,8 +43,24 @@ bold label pushed aside by an illustration, unless it is a label that only
 occurs inside entries (`Damage`, `Fort`, `Cantrips`, a spell level).
 `StatBlockYAMLWriter` maps entries onto the Fantasy Statblocks fields.
 
-Paizo's action glyphs arrive from PDFKit as `[one-action]` and similar; they
-become `pf2:` codes in YAML and ◆ symbols elsewhere.
+Paizo's action glyphs arrive from PDFKit as `[one-action]` and similar: one
+glyph reported as several characters that all share the glyph's box. The
+fragment builder keeps characters with the same box together; without that,
+the wide two-action glyph looks like the text jumping backwards and splits its
+line into pieces. The tokens become `pf2:` codes in Markdown and symbols in
+HTML and plain text.
+
+An encounter roster ("DOCKHAND (2) … CREATURE 0", a page reference, an
+initiative) has the same header as a stat block; a block must contain one of
+Perception, AC, HP, Stealth or Disable to count.
+
+## Overprinted text
+
+Outlined and shadowed type is painted twice, and PDFKit reports both copies.
+`OverprintedSpans` finds font spans that coincide, lets the first copy's
+characters through, and drops what follows in the same place. Matching
+characters by their boxes alone is not safe: a ligature's letters share one
+box, so "ff" would lose an f.
 
 ## HTML preview
 

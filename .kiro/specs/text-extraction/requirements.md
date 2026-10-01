@@ -19,6 +19,10 @@ that plain copy-and-paste from Preview or Acrobat loses.
 - R2.5 Headings are recognised by type size, and bold and italic runs by the
   fonts the PDF actually uses.
 - R2.6 Running headers, footers and page numbers are left out.
+- R2.7 Text the PDF paints twice in the same place (outlined or shadowed
+  type) is read once.
+- R2.8 Paizo's action glyphs are written as `pf2:` codes in Markdown and as
+  symbols (◆, ◆◆, ◆◆◆, ⤾, ◇) in HTML and plain text.
 
 ## R4 Pathfinder stat blocks
 - R4.1 A creature or hazard stat block (name and `LEVEL n` / `CREATURE n` /

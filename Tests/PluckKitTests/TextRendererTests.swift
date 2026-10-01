@@ -77,6 +77,17 @@ struct TextRendererTests {
             """)
     }
 
+    @Test("Action glyph tokens become symbols or codes, even when letter-spaced")
+    func actionGlyphs() {
+        let blocks: [TextBlock] = [.paragraph([
+            TextRun("Swig", isBold: true), TextRun(" [ t w o - a c t i o n s ] drink, then [reaction] duck.")
+        ])]
+        #expect(TextRenderer(format: .plain).render(blocks) == "Swig ◆◆ drink, then ⤾ duck.")
+        #expect(TextRenderer(format: .markdown).render(blocks) == "**Swig** `pf2:2` drink, then `pf2:r` duck.")
+        #expect(TextRenderer(format: .html).render(blocks) == "<p><strong>Swig</strong> "
+            + "<span class=\"action\">◆◆</span> drink, then <span class=\"action\">⤾</span> duck.</p>")
+    }
+
     @Test("HTML wraps blocks in tags and escapes the text")
     func html() {
         #expect(TextRenderer(format: .html).render(Self.blocks) == """

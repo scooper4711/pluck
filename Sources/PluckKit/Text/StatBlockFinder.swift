@@ -22,6 +22,8 @@ struct StatBlockFinder {
     private static let levelPattern = #"(LEVEL|CREATURE|HAZARD) ?[–−-]?\d+$"#
     /// A gap taller than this many lines ends the block.
     private static let maximumGap: CGFloat = 2.5
+    private static let maximumDescriptionLines = 3
+    private static let coreLabels = ["Perception", "AC", "HP", "Stealth", "Disable"]
 
     let body: BodyStyle
 
@@ -99,19 +101,28 @@ struct StatBlockFinder {
             if let entryStyle {
                 guard belongs(line, to: entryStyle) else { break }
             } else if line.text.contains(where: \.isLowercase) {
-                // The first line that is not a row of trait boxes must open an entry.
-                guard line.characters.first?.style.isBold == true else { break }
                 entryStyle = line.characters.last?.style ?? line.style
             }
             lines.append(line)
             taken += row
             previous = line.frame
         }
-        guard let entryStyle else { return nil }
+        // After the trait boxes there may be a line or two of description ("Variant pirate"),
+        // but a real stat block soon reaches an entry with a bold label.
+        let opening = lines.filter { $0.text.contains(where: \.isLowercase) }.prefix(Self.maximumDescriptionLines + 1)
+        guard let entryStyle, opening.contains(where: { $0.characters.first?.style.isBold == true }),
+              lines.contains(where: opensCoreEntry) else { return nil }
         used.formUnion(taken)
         return StatBlockRegion(
             title: header.title, levelLabel: header.levelLabel,
             frame: lines.reduce(header.frame) { $0.union($1.frame) }, segments: [lines], entryStyle: entryStyle)
+    }
+
+    /// Every stat block has one of these entries. An encounter roster has the same header line
+    /// but only a page reference and an initiative beneath it.
+    private func opensCoreEntry(_ line: TextFragment) -> Bool {
+        guard line.characters.first?.style.isBold == true else { return false }
+        return Self.coreLabels.contains { line.text.hasPrefix($0 + " ") }
     }
 
     /// A line stays in the block unless it is a heading or has returned to the body typeface.

@@ -94,7 +94,30 @@ enum ActionGlyph: String, CaseIterable {
         }
     }
 
+    /// A private-use character standing in for the glyph while text around it is escaped.
+    private var placeholder: String {
+        String(UnicodeScalar(0xE000 + (Self.allCases.firstIndex(of: self) ?? 0)).map(Character.init) ?? " ")
+    }
+
+    /// Escapes `text` for a markup language and writes its glyph tokens with `replacement`,
+    /// keeping the replacement itself out of the escaping.
+    static func rendering(
+        _ text: String, escape: (String) -> String, with replacement: (ActionGlyph) -> String
+    ) -> String {
+        let escaped = escape(replacing(in: text, with: \.placeholder))
+        return allCases.reduce(escaped) { $0.replacingOccurrences(of: $1.placeholder, with: replacement($1)) }
+    }
+
+    /// Replaces each glyph token. Some PDFs letter-space the token ("[ t w o - a c t i o n s ]"),
+    /// so spaces between its characters are allowed.
     static func replacing(in text: String, with replacement: (ActionGlyph) -> String) -> String {
-        allCases.reduce(text) { $0.replacingOccurrences(of: $1.rawValue, with: replacement($1)) }
+        allCases.reduce(text) { result, glyph in
+            let pattern = glyph.rawValue.map { NSRegularExpression.escapedPattern(for: String($0)) }
+                .joined(separator: " ?")
+            guard let expression = try? NSRegularExpression(pattern: pattern) else { return result }
+            let template = NSRegularExpression.escapedTemplate(for: replacement(glyph))
+            return expression.stringByReplacingMatches(
+                in: result, range: NSRange(result.startIndex..., in: result), withTemplate: template)
+        }
     }
 }

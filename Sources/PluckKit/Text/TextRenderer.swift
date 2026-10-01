@@ -93,8 +93,8 @@ private enum PlainTextWriter {
     static func render(_ blocks: [TextBlock]) -> String {
         joinedBlocks(blocks) { block in
             switch block {
-            case .heading(_, let runs), .paragraph(let runs): runs.text
-            case .listItem(let runs): "• " + runs.text
+            case .heading(_, let runs), .paragraph(let runs): ActionGlyph.replacing(in: runs.text, with: \.symbol)
+            case .listItem(let runs): "• " + ActionGlyph.replacing(in: runs.text, with: \.symbol)
             case .box(let box): render(box.blocks)
             case .statBlock(let statBlock): StatBlockWriter.plainText(statBlock)
             }
@@ -146,7 +146,13 @@ private struct MarkdownWriter {
         }.joined()
     }
 
+    /// Escapes Markdown's own characters; action glyphs become the `pf2:` codes that the
+    /// Obsidian action-icon plugins draw.
     private func escape(_ text: String) -> String {
+        ActionGlyph.rendering(text, escape: escapeMarkup, with: \.statblockCode)
+    }
+
+    private func escapeMarkup(_ text: String) -> String {
         text.reduce(into: "") { result, character in
             if Self.escaped.contains(character) { result.append("\\") }
             result.append(character)
@@ -210,7 +216,12 @@ private enum HTMLWriter {
         }.joined()
     }
 
+    /// Escapes HTML's own characters; action glyphs become their symbols in a `span.action`.
     private static func escape(_ text: String) -> String {
+        ActionGlyph.rendering(text, escape: escapeMarkup) { "<span class=\"action\">\($0.symbol)</span>" }
+    }
+
+    private static func escapeMarkup(_ text: String) -> String {
         text.replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")

@@ -25,10 +25,7 @@ enum StatBlockWriter {
             if index > 0 { lines.append("<hr>") }
             lines += section.map { entry in
                 let label = entry.name.isEmpty ? "" : "<strong>\(escape(entry.name))</strong> "
-                let body = ActionGlyph.replacing(in: inline(entry.runs)) {
-                    "<span class=\"action\">\($0.symbol)</span>"
-                }
-                return "<p>\(label)\(body)</p>"
+                return "<p>\(label)\(inline(entry.runs))</p>"
             }
         }
         lines.append("</div>")

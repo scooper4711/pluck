@@ -192,6 +192,36 @@ struct StatBlockTests {
         #expect(block.entry(named: "AC")?.text == "20, Fort +10, Will +9")
     }
 
+    @Test("An encounter roster shares the header line but is not a stat block")
+    func encounterRoster() throws {
+        let blocks = try Page.blocks { page in
+            page.lines(Self.bodyLines, x: Page.rightColumn, top: 100)
+            page.line("DOCKHAND (2)", x: Page.leftColumn, top: 100, font: .display, size: 12)
+            page.line("CREATURE 0", x: Page.leftColumn + 150, top: 100, font: .display, size: 12)
+            page.line("Page 11", x: Page.leftColumn, top: 114, font: .sans)
+            page.line([("Initiative", .display), (" Perception +3", .sans)], x: Page.leftColumn, top: 126)
+        }
+        #expect(!blocks.contains { if case .statBlock = $0 { true } else { false } })
+        #expect(blocks.first?.summary == "h3:DOCKHAND (2) CREATURE 0")
+    }
+
+    @Test("A line of description between the traits and the first entry is kept")
+    func descriptionLine() throws {
+        let blocks = try Page.blocks { page in
+            page.lines(Self.bodyLines, x: Page.rightColumn, top: 100)
+            let left = Page.leftColumn
+            page.line("DWARF RIGGER", x: left, top: 100, font: .display, size: 12)
+            page.line("CREATURE 1", x: left + 150, top: 100, font: .display, size: 12)
+            page.line("MEDIUM DWARF HUMANOID", x: left, top: 112, font: .display, size: 7)
+            page.line("Variant rigger (NPC Core 147)", x: left, top: 126, font: .sans)
+            page.line([("Perception", .display), (" +10; darkvision", .sans)], x: left, top: 138)
+            page.line([("AC", .display), (" 15", .sans)], x: left, top: 150)
+        }
+        guard case .statBlock(let block) = try #require(blocks.first) else { return }
+        #expect(block.entries.map(\.name) == ["", "Perception", "AC"])
+        #expect(block.entries.first?.text == "Variant rigger (NPC Core 147)")
+    }
+
     @Test("Level labels are normalised, and negative levels keep their sign")
     func levels() {
         #expect(StatBlockParser.level(from: "LEVEL –1") == "Creature -1")
