@@ -107,6 +107,13 @@ final class ImageGridCoordinator: NSObject, NSCollectionViewDelegate {
         return dragWriter.provider(for: item, exporter: actions.model.exporter)
     }
 
+    func collectionView(
+        _ collectionView: NSCollectionView, draggingSession session: NSDraggingSession,
+        willBeginAt screenPoint: NSPoint, forItemsAt indexPaths: Set<IndexPath>
+    ) {
+        dragWriter.offerImageData(on: session.draggingPasteboard)
+    }
+
     // MARK: - Private
 
     private func applySnapshot() {
