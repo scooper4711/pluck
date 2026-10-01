@@ -7,3 +7,4 @@
 - [x] 5. Output: export, pasteboard (R6.1, R6.3)
 - [x] 6. App shell: sidebar, grid, drag-out, menus, settings, password prompt (R1, R2, R5.1, R6.2)
 - [x] 7. App bundle, name and icon (R7.1)
+- [x] 8. Multiple documents, one window each; Open Recent (R1.4, R1.5)

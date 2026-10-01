@@ -35,7 +35,7 @@ struct ContentView: View {
             } description: {
                 Text("Drop a PDF here to pull out its images.")
             } actions: {
-                Button("Open…", action: actions.chooseDocument)
+                Button("Open…", action: actions.chooseDocuments)
             }
         case .failed(let message):
             ContentUnavailableView("Couldn’t Open the PDF", systemImage: "exclamationmark.triangle",
@@ -65,15 +65,14 @@ struct ContentView: View {
     }
 
     private func submitPassword() {
-        guard let url = model.documentURL else { return }
-        actions.open(url, password: password)
+        actions.unlock(password: password)
         password = ""
     }
 
     private func openDropped(_ urls: [URL]) -> Bool {
-        guard let url = urls.first(where: { $0.pathExtension.lowercased() == "pdf" }) else { return false }
-        actions.open(url)
-        return true
+        let pdfs = urls.filter { $0.pathExtension.lowercased() == "pdf" }
+        actions.open(pdfs)
+        return !pdfs.isEmpty
     }
 }
 

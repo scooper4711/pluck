@@ -10,7 +10,7 @@ struct PluckToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .navigation) {
-            Button("Open", systemImage: "folder", action: actions.chooseDocument)
+            Button("Open", systemImage: "folder", action: actions.chooseDocuments)
                 .help("Open a PDF")
         }
         ToolbarItemGroup {

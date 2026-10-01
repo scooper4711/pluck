@@ -6,16 +6,20 @@ import UniformTypeIdentifiers
 @MainActor
 struct AppActions {
     let model: PluckModel
+    let router: DocumentRouter
 
-    func chooseDocument() {
-        let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.pdf]
-        panel.allowsMultipleSelection = false
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        open(url)
+    func chooseDocuments() {
+        router.open(DocumentPanel.choosePDFs())
     }
 
-    func open(_ url: URL, password: String = "") {
+    /// Shows each PDF in a window of its own.
+    func open(_ urls: [URL]) {
+        router.open(urls)
+    }
+
+    /// Retries this window's password-protected PDF.
+    func unlock(password: String) {
+        guard let url = model.documentURL else { return }
         Task { await model.open(url, password: password) }
     }
 
@@ -56,5 +60,16 @@ struct AppActions {
                 NSAlert(error: error).runModal()
             }
         }
+    }
+}
+
+@MainActor
+enum DocumentPanel {
+    /// Asks the user for PDFs to open; empty if they cancel.
+    static func choosePDFs() -> [URL] {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.pdf]
+        panel.allowsMultipleSelection = true
+        return panel.runModal() == .OK ? panel.urls : []
     }
 }
