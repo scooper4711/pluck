@@ -170,6 +170,8 @@ final class ImageGridMenu: NSObject {
         addItem("Copy", action: #selector(copySelection))
         addItem("Export…", action: #selector(exportSelection))
         menu.addItem(.separator())
+        addItem("Show Page in Sidebar", action: #selector(revealPage))
+        menu.addItem(.separator())
         for (index, entry) in Self.edits.enumerated() {
             addItem(entry.title, action: #selector(applyEdit(_:))).tag = index
         }
@@ -185,6 +187,8 @@ final class ImageGridMenu: NSObject {
     @objc private func copySelection() { actions.copySelection() }
 
     @objc private func exportSelection() { actions.exportSelection() }
+
+    @objc private func revealPage() { actions.revealPageOfSelectedImage() }
 
     @objc private func applyEdit(_ sender: NSMenuItem) { actions.apply(Self.edits[sender.tag].edit) }
 }

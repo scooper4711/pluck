@@ -45,6 +45,10 @@ struct AppActions {
         perform { try await model.exportVisible(to: directory) }
     }
 
+    func revealPageOfSelectedImage() {
+        model.revealPageOfSelectedImage()
+    }
+
     func copyText() {
         model.copyText()
     }

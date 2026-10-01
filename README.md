@@ -17,6 +17,8 @@ A native macOS utility that opens a PDF and offers up every image inside it.
 - **Pathfinder stat blocks** — recognised and written as Fantasy Statblocks YAML in
   Markdown, and as structured HTML.
 - **Several PDFs at once** — each in its own window, with File ▸ Open Recent.
+- **See it in context** — right-click an image and choose Show Page in Sidebar to scroll
+  the navigator to the page it is on, without changing which pages are selected.
 - **Multi-select** — click, ⌘/⇧-click, rubber-band or ⌘A.
 - **Rotate and flip** — ⌘L / ⌘R and the Image menu; edits carry through to
   whatever leaves the app.

@@ -64,6 +64,28 @@ struct PluckModelTests {
         #expect(sizes == ["8x8", "2x1", "1x1"])
     }
 
+    @Test("Revealing an image's page asks the navigator for it without touching the selection")
+    func revealPage() async throws {
+        try await openSample()
+        select(width: 1)
+        model.revealPageOfSelectedImage()
+        #expect(model.pageReveal?.pageIndex == 1)
+        #expect(model.selectedPages.isEmpty && model.statusMessage == "Page 2")
+
+        // The border is on all three pages: asking again steps through them and wraps round.
+        select(width: 8)
+        let pages = (0..<4).map { _ -> Int? in
+            model.revealPageOfSelectedImage()
+            return model.pageReveal?.pageIndex
+        }
+        #expect(pages == [0, 1, 2, 0])
+        #expect(model.statusMessage == "Page 1 (1 of the 3 pages with this image)")
+
+        model.selectedPages = [1, 2]
+        model.revealPageOfSelectedImage()
+        #expect(model.pageReveal?.pageIndex == 1 && model.selectedPages == [1, 2])
+    }
+
     @Test("Selected images that are filtered out of view are not acted on")
     func hiddenSelection() async throws {
         try await openSample()

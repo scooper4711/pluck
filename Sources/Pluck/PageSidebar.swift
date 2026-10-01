@@ -8,11 +8,46 @@ struct PageSidebar: View {
     /// The pixel size thumbnails are drawn at, stepped so that dragging the divider does not
     /// redraw every page at every width.
     @State private var thumbnailPixels = 400
+    /// The page just scrolled to on request, marked for a moment so it can be picked out.
+    @State private var highlightedPage: Int?
 
     var body: some View {
+        ScrollViewReader { scroller in
+            pageList
+                .onChange(of: model.pageReveal) { _, reveal in
+                    guard let reveal else { return }
+                    highlight(reveal.pageIndex)
+                    Task { await scroll(scroller, toTopOf: reveal.pageIndex) }
+                }
+        }
+    }
+
+    /// Puts a page's row at the top of the list. Rows that have not been shown yet only have
+    /// estimated heights, so the first jump can land short; a second, once the rows around the
+    /// target exist, lands exactly.
+    private func scroll(_ scroller: ScrollViewProxy, toTopOf pageIndex: Int) async {
+        scroller.scrollTo(pageIndex, anchor: .top)
+        try? await Task.sleep(for: .milliseconds(150))
+        scroller.scrollTo(pageIndex, anchor: .top)
+    }
+
+    private func highlight(_ pageIndex: Int) {
+        highlightedPage = pageIndex
+        Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            if highlightedPage == pageIndex { withAnimation { highlightedPage = nil } }
+        }
+    }
+
+    private var pageList: some View {
         List(selection: $model.selectedPages) {
             ForEach(0..<model.pageCount, id: \.self) { pageIndex in
                 PageRow(model: model, pageIndex: pageIndex, thumbnailPixels: thumbnailPixels)
+                    .overlay {
+                        if highlightedPage == pageIndex {
+                            RoundedRectangle(cornerRadius: 6).stroke(Color.accentColor, lineWidth: 2)
+                        }
+                    }
             }
         }
         .onGeometryChange(for: Int.self) { proxy in

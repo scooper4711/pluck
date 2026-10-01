@@ -48,6 +48,8 @@ public final class PluckModel {
     /// The text of each page extracted so far, by page index.
     public private(set) var pageTexts: [Int: [TextBlock]] = [:]
     public private(set) var isLoadingText = false
+    /// The page the navigator has last been asked to bring into view.
+    public private(set) var pageReveal: PageReveal?
 
     @ObservationIgnored private var source: PDFImageSource?
     @ObservationIgnored private var thumbnailer: PDFPageThumbnailer?
@@ -159,6 +161,21 @@ public final class PluckModel {
         if loadGeneration == generation { isLoadingText = false }
     }
 
+    /// Asks the navigator to bring the selected image's page into view, without changing which
+    /// pages are selected. An image used on several pages is shown on the first of them (among
+    /// the selected pages, when there are any); asking again moves on to its next page.
+    public func revealPageOfSelectedImage() {
+        guard let image = selectedImages.first else { return }
+        let shown = image.pageIndexes.filter { selectedPages.isEmpty || selectedPages.contains($0) }
+        let pages = shown.isEmpty ? image.pageIndexes : shown
+        let previous = pageReveal?.imageID == image.id ? pages.firstIndex(of: pageReveal?.pageIndex ?? -1) : nil
+        let position = previous.map { ($0 + 1) % pages.count } ?? 0
+        pageReveal = PageReveal(
+            pageIndex: pages[position], imageID: image.id, sequence: (pageReveal?.sequence ?? 0) + 1)
+        let place = pages.count > 1 ? " (\(position + 1) of the \(pages.count) pages with this image)" : ""
+        statusMessage = "Page \(pages[position] + 1)\(place)"
+    }
+
     // MARK: - Editing
 
     /// Rotates or flips every selected image.
@@ -227,6 +244,7 @@ public final class PluckModel {
         selectedImageIDs = []
         statusMessage = ""
         pageTexts = [:]
+        pageReveal = nil
         isLoadingText = false
         source = nil
         thumbnailer = nil
@@ -265,4 +283,13 @@ public final class PluckModel {
     private static func count(_ count: Int, _ noun: String) -> String {
         "\(count) \(noun)\(count == 1 ? "" : "s")"
     }
+}
+
+/// A request to bring a page into view in the navigator.
+public struct PageReveal: Equatable, Sendable {
+    public let pageIndex: Int
+    /// The image whose page was asked for.
+    let imageID: String
+    /// Distinguishes a repeated request for the same page, so that it scrolls again.
+    let sequence: Int
 }
