@@ -49,6 +49,12 @@ is applied to thumbnails for display and to full-size pixels on output.
   `.webp`; used by both Export and drag-out file promises.
 - `PasteboardWriter` puts PNG + TIFF per image on the pasteboard, because
   few apps accept WebP pasted.
+- A drag carries a WebP file promise per image (`NSFilePromiseProvider`) plus
+  PNG data for apps that take pictures rather than files, such as Flip Map
+  Printer. The PNG is attached to the drag's pasteboard items through an
+  `NSPasteboardItemDataProvider` once the drag begins, and rendered only if a
+  drop asks for it. Adding the type by subclassing the promise provider does
+  not work: the type is advertised but the data is never requested.
 
 ## Concurrency
 
