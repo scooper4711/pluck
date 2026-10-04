@@ -20,6 +20,10 @@ struct PluckCommands: Commands {
                     .disabled(recents.urls.isEmpty)
             }
         }
+        CommandGroup(after: .pasteboard) {
+            Button("Copy All Stat Blocks") { actions?.copyStatBlocks() }
+                .keyboardShortcut("c", modifiers: [.command, .option])
+        }
         CommandGroup(replacing: .importExport) {
             Button("Export Selected…") { actions?.exportSelection() }
                 .keyboardShortcut("e")

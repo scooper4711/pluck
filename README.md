@@ -16,6 +16,9 @@ A native macOS utility that opens a PDF and offers up every image inside it.
   or export. HTML is shown rendered but copies as markup.
 - **Pathfinder stat blocks** — recognised and written as Fantasy Statblocks YAML in
   Markdown, and as structured HTML.
+- **Stat blocks for other apps** — the stat blocks on the shown pages are listed above the
+  text: click one to copy it, drag it out, or Copy All Stat Blocks (⌥⌘C). Apps such as
+  Combat Pad get the structured block; every other app gets plain text.
 - **Several PDFs at once** — each in its own window, with File ▸ Open Recent.
 - **See it in context** — right-click an image and choose Show Page in Sidebar to scroll
   the navigator to the page it is on, without changing which pages are selected.

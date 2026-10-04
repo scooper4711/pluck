@@ -53,6 +53,7 @@ struct ContentView: View {
     private var textOutput: some View {
         textView
             .id(usesObsidianCallouts)
+            .safeAreaInset(edge: .top, spacing: 0) { StatBlockStrip(model: model) }
             .overlay {
                 if !model.isLoadingText, model.visibleText.isEmpty {
                     ContentUnavailableView("No Text", systemImage: "text.alignleft",
