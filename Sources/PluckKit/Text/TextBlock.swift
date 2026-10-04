@@ -1,7 +1,7 @@
 import Foundation
 
 /// A stretch of text in one weight and slant.
-public struct TextRun: Equatable, Sendable {
+public struct TextRun: Equatable, Sendable, Codable {
     public var text: String
     public var isBold: Bool
     public var isItalic: Bool
