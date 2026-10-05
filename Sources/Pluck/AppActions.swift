@@ -53,6 +53,10 @@ struct AppActions {
         model.copyText()
     }
 
+    func copyStatBlocks() {
+        model.copyStatBlocks(model.visibleStatBlocks)
+    }
+
     func exportText() {
         let panel = NSSavePanel()
         panel.nameFieldStringValue = model.textFileName

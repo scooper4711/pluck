@@ -61,6 +61,18 @@ When the document's body text shares the stat blocks' typeface, a block is
 only continued into the next column if it was visibly cut off: it ended on a
 rule or in mid-sentence. The continuation then runs to the first blank line.
 
+### Copying stat blocks to other apps
+`StatBlock`, its entries and `TextRun` are `Codable`. `StatBlockExport` writes
+`{ "format": 1, "blocks": [StatBlock] }` as JSON under the exported type
+`io.github.scooper4711.pluck.statblock` (declared in `Info.plist`, conforming
+to `public.json`), alongside `StatBlockWriter`'s plain text. The same pair is
+offered by an `NSItemProvider` for drags. Each run keeps its bold and italic
+flags, and action glyphs stay as tokens such as `[two-actions]`, so the
+receiving app can rebuild the rules text. `PluckModel.visibleStatBlocks`
+collects the blocks of the shown pages, including those inside boxes, and
+`StatBlockStrip` lists them above the text view. The `format` number is bumped
+only for changes an older reader can't ignore.
+
 ## Overprinted text
 
 Outlined and shadowed type is painted twice, and PDFKit reports both copies.

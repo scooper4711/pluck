@@ -280,7 +280,7 @@ public final class PluckModel {
         return RenderRequest(source: source, locator: image.locator, transform: transform(for: image))
     }
 
-    private static func count(_ count: Int, _ noun: String) -> String {
+    static func count(_ count: Int, _ noun: String) -> String {
         "\(count) \(noun)\(count == 1 ? "" : "s")"
     }
 }

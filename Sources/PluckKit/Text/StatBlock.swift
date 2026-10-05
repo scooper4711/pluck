@@ -1,9 +1,9 @@
 import Foundation
 
 /// A creature or hazard stat block in the Pathfinder Second Edition layout.
-public struct StatBlock: Equatable, Sendable {
+public struct StatBlock: Equatable, Sendable, Codable {
     /// One labelled line of the block, such as `Perception +6; darkvision`.
-    public struct Entry: Equatable, Sendable {
+    public struct Entry: Equatable, Sendable, Codable {
         /// The bold label that opens the entry: `Perception`, `AC`, `Melee`.
         public var name: String
         /// Everything after the label.

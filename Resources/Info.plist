@@ -41,5 +41,18 @@
             </array>
         </dict>
     </array>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>io.github.scooper4711.pluck.statblock</string>
+            <key>UTTypeDescription</key>
+            <string>Pathfinder Stat Block</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.json</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
