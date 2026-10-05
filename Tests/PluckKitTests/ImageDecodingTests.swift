@@ -109,6 +109,24 @@ struct ImageDecodingTests {
         #expect(isClose(image.pixel(4, 3), Color.red + [255]))
     }
 
+    @Test("A CMYK JPEG's samples mean what they say unless its Decode array inverts them")
+    func cmykJPEG() throws {
+        let orange: [UInt8] = [0, 128, 255, 0]
+        let jpeg = try Fixture.cmykJPEG(ink: orange, width: 8, height: 6)  // Stores the inverted samples.
+        let entries = "/ColorSpace /DeviceCMYK /BitsPerComponent 8 /Filter /DCTDecode"
+        let inverted = try ExtractedPage.single {
+            $0.addImage(width: 8, height: 6, entries: entries + " /Decode [1 0 1 0 1 0 1 0]", data: jpeg)
+        }
+        let plain = try ExtractedPage.single { $0.addImage(width: 8, height: 6, entries: entries, data: jpeg) }
+
+        let expectedOrange = try Fixture.rendered(ink: orange)
+        let expectedStored = try Fixture.rendered(ink: orange.map { 255 - $0 })
+        let invertedPixel = try #require(inverted.rasters.first).pixel(4, 3)
+        let plainPixel = try #require(plain.rasters.first).pixel(4, 3)
+        #expect(isClose(invertedPixel, expectedOrange), "\(invertedPixel) should be \(expectedOrange)")
+        #expect(isClose(plainPixel, expectedStored), "\(plainPixel) should be \(expectedStored)")
+    }
+
     @Test("An image with an unusable colour space is counted, not fatal")
     func undecodable() throws {
         let builder = PDFBuilder()

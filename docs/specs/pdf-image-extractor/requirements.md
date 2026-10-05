@@ -33,6 +33,9 @@ image inside it for copying, dragging out, or exporting as WebP.
   those painted through form XObjects, tiling patterns and inline images.
 - R3.3 Transparency is honoured: soft masks, stencil masks, colour-key masks
   and stencil images all produce an alpha channel.
+- R3.3a Colors match the page: CMYK images, JPEG-compressed ones included,
+  follow the image's color space and `Decode` array, so none comes out as a
+  negative.
 - R3.4 An image that cannot be decoded is skipped and counted, never fatal.
 
 ## R4 Duplicate detection

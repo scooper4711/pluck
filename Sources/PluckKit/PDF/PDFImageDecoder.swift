@@ -61,7 +61,10 @@ struct PDFImageDecoder {
         }
         switch format {
         case .raw: return try rawImage(bytes, info)
-        case .jpegEncoded, .JPEG2000: return try encodedImage(bytes)
+        case .jpegEncoded:
+            let image = try encodedImage(bytes)
+            return fourColorImage(from: image, info) ?? image
+        case .JPEG2000: return try encodedImage(bytes)
         @unknown default: throw PluckError.unsupportedImage(reason: "unknown stream encoding")
         }
     }
@@ -71,6 +74,23 @@ struct PDFImageDecoder {
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else { throw PluckError.unsupportedImage(reason: "ImageIO cannot decode the JPEG data") }
         return image
+    }
+
+    /// ImageIO reads a four-color JPEG the way Photoshop writes one: an Adobe marker means the samples are
+    /// stored inverted, so ImageIO flips them back. In a PDF the samples mean what they say unless the image's
+    /// own `Decode` array inverts them, so the image is rebuilt from ImageIO's samples in the PDF's color space.
+    /// Without this, such images come out as negatives. Nil leaves other images as ImageIO decoded them.
+    private func fourColorImage(from decoded: CGImage, _ info: PDFImageInfo) -> CGImage? {
+        guard decoded.colorSpace?.model == .cmyk, decoded.bitsPerComponent == 8, decoded.bitsPerPixel == 32,
+              let space = try? colorSpace(of: info), space.componentCount == 4, !space.isInkAmount,
+              let provider = decoded.dataProvider
+        else { return nil }
+        let decode = decodeArray(for: info, space: space)
+        return CGImage(
+            width: decoded.width, height: decoded.height, bitsPerComponent: 8, bitsPerPixel: 32,
+            bytesPerRow: decoded.bytesPerRow, space: space.cgColorSpace, bitmapInfo: decoded.bitmapInfo,
+            provider: provider, decode: decode.isEmpty ? nil : decode, shouldInterpolate: false,
+            intent: .defaultIntent)
     }
 
     private func rawImage(_ bytes: CFData, _ info: PDFImageInfo) throws -> CGImage {
