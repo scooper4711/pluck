@@ -22,7 +22,11 @@ A Swift package with three targets:
    every page.
 2. **Decode** (`PDFImageDecoder`) — turn an image stream into a
    `RasterImage` (8-bit sRGB, straight alpha). JPEG/JPEG 2000 streams go
-   through ImageIO; raw samples are wrapped in a `CGImage` using the parsed
+   through ImageIO. ImageIO reads a four-color (CMYK) JPEG as Photoshop writes
+   it, flipping samples an Adobe marker says are inverted; in a PDF the samples
+   mean what they say unless the image's `Decode` array inverts them, so such
+   images are rebuilt from ImageIO's samples in the PDF's color space with that
+   `Decode` array (otherwise they come out as negatives). Raw samples are wrapped in a `CGImage` using the parsed
    colour space (`PDFColorSpaceParser`), bit depth and `Decode` array. The
    alpha channel comes from `SMask`, a stencil `Mask` stream, a colour-key
    `Mask` array, or the image being a stencil itself.

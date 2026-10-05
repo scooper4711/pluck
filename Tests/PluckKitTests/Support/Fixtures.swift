@@ -3,6 +3,7 @@ import Foundation
 import ImageIO
 import libwebp
 @testable import PluckKit
+import Testing
 import UniformTypeIdentifiers
 
 enum Color {
@@ -66,6 +67,31 @@ enum Fixture {
         CGImageDestinationAddImage(destination, image, nil)
         CGImageDestinationFinalize(destination)
         return data as Data
+    }
+
+    /// JPEG data for a solid four-color image, written the way Photoshop and ImageIO write one: with an
+    /// Adobe marker and the samples stored inverted.
+    static func cmykJPEG(ink: [UInt8], width: Int, height: Int) throws -> Data {
+        var samples = Array(repeating: ink, count: width * height).flatMap { $0 }
+        let context = try #require(CGContext(
+            data: &samples, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+            space: CGColorSpaceCreateDeviceCMYK(), bitmapInfo: CGImageAlphaInfo.none.rawValue))
+        let data = NSMutableData()
+        let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, try #require(context.makeImage()),
+                                   [kCGImageDestinationLossyCompressionQuality: 1.0] as CFDictionary)
+        CGImageDestinationFinalize(destination)
+        return data as Data
+    }
+
+    /// The RGB that Core Graphics renders for one CMYK color, to compare decoded images against.
+    static func rendered(ink: [UInt8]) throws -> [UInt8] {
+        let provider = try #require(CGDataProvider(data: Data(ink) as CFData))
+        let image = try #require(CGImage(
+            width: 1, height: 1, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: 4,
+            space: CGColorSpaceCreateDeviceCMYK(), bitmapInfo: [], provider: provider, decode: nil,
+            shouldInterpolate: false, intent: .defaultIntent))
+        return try RasterImage(cgImage: image).pixel(0, 0)
     }
 
     /// A PDF encrypted by Core Graphics, containing one image.
