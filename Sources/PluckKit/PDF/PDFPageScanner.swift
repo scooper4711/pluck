@@ -11,8 +11,9 @@ struct PDFImageOccurrence {
 }
 
 /// Finds the images a page actually paints by walking its content stream, descending into
-/// form XObjects and tiling patterns. Images that merely sit in a shared resource dictionary
-/// are not reported.
+/// form XObjects and tiling patterns, then the appearances of its annotations (a picture
+/// placed in a form field). Images that merely sit in a shared resource dictionary are not
+/// reported.
 enum PDFPageScanner {
     /// Calls `visit` for each image in painting order. Occurrences must be consumed inside `visit`.
     static func scan(_ page: CGPDFPage, visit: @escaping (PDFImageOccurrence) -> Void) {
@@ -20,6 +21,9 @@ enum PDFPageScanner {
         let contentStream = CGPDFContentStreamCreateWithPage(page)
         defer { CGPDFContentStreamRelease(contentStream) }
         context.scan(contentStream)
+        for appearance in PDFAnnotationAppearances.visibleStreams(of: page) {
+            context.scanContainer(appearance, parent: contentStream)
+        }
     }
 }
 
@@ -112,7 +116,7 @@ private final class PDFScanContext {
         return nil
     }
 
-    private func scanContainer(_ stream: PDFStream, parent: CGPDFContentStreamRef) {
+    func scanContainer(_ stream: PDFStream, parent: CGPDFContentStreamRef) {
         guard scannedContainers.insert(stream).inserted, let dictionary = stream.dictionary else { return }
         // Core Graphics needs some dictionary here; a container with no resources gets its own
         // dictionary, which has no resource categories, so `resource` falls back to the parent's.

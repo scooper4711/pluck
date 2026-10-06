@@ -8,6 +8,7 @@ final class PDFBuilder {
     /// Object bodies; object `n` lives at index `n - 1`. The first two are filled in by `build()`.
     private var bodies: [Data] = [Data(), Data()]
     private var pageIDs: [Int] = []
+    private var formFieldIDs: [Int] = []
 
     @discardableResult
     func addObject(_ body: String) -> Int {
@@ -24,13 +25,30 @@ final class PDFBuilder {
         return bodies.count
     }
 
+    /// How a page is set up, beyond what it draws.
+    struct PageOptions {
+        var mediaBox = "0 0 200 200"
+        var rotation = 0
+        var annotations: [Int] = []
+    }
+
     /// Adds a page with the given resource dictionary entries and content stream.
-    func addPage(resources: String, content: Data, mediaBox: String = "0 0 200 200") {
+    func addPage(resources: String, content: Data, options: PageOptions = PageOptions()) {
         let contentID = addStream("", data: content)
+        let annots = options.annotations.map { "\($0) 0 R" }.joined(separator: " ")
         pageIDs.append(addObject("""
-            << /Type /Page /Parent \(Self.pageTreeID) 0 R /MediaBox [\(mediaBox)] \
-            /Resources << \(resources) >> /Contents \(contentID) 0 R >>
+            << /Type /Page /Parent \(Self.pageTreeID) 0 R /MediaBox [\(options.mediaBox)] \
+            /Rotate \(options.rotation) /Resources << \(resources) >> /Contents \(contentID) 0 R \
+            /Annots [\(annots)] >>
             """))
+    }
+
+    /// Adds a widget annotation that is also a field of the document's interactive form.
+    @discardableResult
+    func addFormField(_ body: String) -> Int {
+        let id = addObject(body)
+        formFieldIDs.append(id)
+        return id
     }
 
     func addPage(resources: String, content: String) {
@@ -46,7 +64,8 @@ final class PDFBuilder {
 
     func build() -> Data {
         let kids = pageIDs.map { "\($0) 0 R" }.joined(separator: " ")
-        bodies[Self.catalogID - 1] = Data("<< /Type /Catalog /Pages \(Self.pageTreeID) 0 R >>".utf8)
+        bodies[Self.catalogID - 1] = Data(
+            "<< /Type /Catalog /Pages \(Self.pageTreeID) 0 R \(acroForm) >>".utf8)
         bodies[Self.pageTreeID - 1] = Data("<< /Type /Pages /Kids [\(kids)] /Count \(pageIDs.count) >>".utf8)
 
         var pdf = Data("%PDF-1.7\n".utf8)
@@ -64,6 +83,14 @@ final class PDFBuilder {
         trailer += "startxref\n\(crossReferenceOffset)\n%%EOF\n"
         pdf.append(Data(trailer.utf8))
         return pdf
+    }
+
+    /// The interactive form, with Helvetica as `/Helv` for fields' default appearances.
+    private var acroForm: String {
+        guard !formFieldIDs.isEmpty else { return "" }
+        let fields = formFieldIDs.map { "\($0) 0 R" }.joined(separator: " ")
+        return "/AcroForm << /Fields [\(fields)] /DA (/Helv 0 Tf 0 g) "
+            + "/DR << /Font << /Helv << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> >>"
     }
 
     /// Writes the PDF into a fresh temporary directory and returns its URL.

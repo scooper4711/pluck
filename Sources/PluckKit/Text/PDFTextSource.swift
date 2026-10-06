@@ -47,7 +47,10 @@ public final class PDFTextSource: @unchecked Sendable {
     private func makeBlocks(forPageAt index: Int) -> [TextBlock] {
         let profile = documentProfile()
         guard let content = content(ofPageAt: index) else { return [] }
-        let fragments = content.fragments.filter { !profile.isRunningElement($0, on: content.size) }
+        // Typed-in values take the body style so they read as part of the text around them
+        // rather than as headings; they are set in whatever font the form's author chose.
+        let fieldValues = content.fieldValues.map { $0.restyled(as: profile.body) }
+        let fragments = content.fragments.filter { !profile.isRunningElement($0, on: content.size) } + fieldValues
         let flow = PageLayout(pageSize: content.size, body: profile.body)
             .flow(fragments: fragments, panels: content.panels, rules: content.rules)
         return ParagraphBuilder(
@@ -70,8 +73,9 @@ public final class PDFTextSource: @unchecked Sendable {
         else { return nil }
         let graphics = PDFContentInterpreter.graphics(of: graphicsPage)
         let reader = PageTextReader(page: page, graphics: graphics)
+        let fields = FormFieldReader(page: page, readingRect: reader.readingRect)
         let content = PageContent(
-            size: page.bounds(for: .cropBox).size, fragments: reader.fragments(),
+            size: page.bounds(for: .cropBox).size, fragments: reader.fragments(), fieldValues: fields.fragments(),
             panels: (graphics.panels + graphics.images).map(reader.readingRect),
             images: graphics.images.map(reader.readingRect), rules: graphics.rules.map(reader.readingRect))
         contents[index] = content
@@ -83,6 +87,9 @@ public final class PDFTextSource: @unchecked Sendable {
 struct PageContent {
     let size: CGSize
     let fragments: [TextFragment]
+    /// What has been typed into the page's form fields. They are kept apart from the page's
+    /// printed text, which alone decides the document's body style and running headers.
+    let fieldValues: [TextFragment]
     /// Filled shapes and images: anything that could be the background of a box.
     let panels: [CGRect]
     let images: [CGRect]

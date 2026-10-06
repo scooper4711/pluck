@@ -42,6 +42,12 @@ struct TextFragment {
         return runs
     }
 
+    /// The same characters in the plain face of a document's body text.
+    func restyled(as body: BodyStyle) -> TextFragment {
+        let style = CharacterStyle(fontName: body.family, size: body.size, isBold: false, isItalic: false)
+        return TextFragment(frame: frame, characters: characters.map { StyledCharacter(text: $0.text, style: style) })
+    }
+
     /// Joins fragments that sit on the same baseline into one line, left to right.
     static func line(from fragments: [TextFragment]) -> TextFragment {
         let ordered = fragments.sorted { $0.frame.minX < $1.frame.minX }

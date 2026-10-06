@@ -22,6 +22,8 @@ struct TextPage {
     static let leading: CGFloat = 12
 
     private var content = ""
+    /// Form fields as widget dictionaries, without the page reference.
+    private var fields: [String] = []
 
     /// Draws text starting at `x`. Several `(text, font)` pieces continue on the same baseline.
     mutating func line(_ pieces: [(String, Font)], x: CGFloat, top: CGFloat, size: CGFloat = 10) {
@@ -56,13 +58,25 @@ struct TextPage {
         content += "\(x) \(Self.size.height - top) m \(x + width) \(Self.size.height - top) l S\n"
     }
 
+    /// Adds a text field filled in with `value`, measuring `frame` from the top of the page.
+    /// `entries` adds to or overrides the widget's dictionary: flags, alignment, appearance.
+    mutating func field(_ value: String, in frame: CGRect, entries: String = "/DA (/Helv 10 Tf 0 g)") {
+        let bottom = Self.size.height - frame.maxY
+        fields.append("""
+            << /Type /Annot /Subtype /Widget /FT /Tx /F 4 /T (field\(fields.count)) /V (\(value)) \
+            /Rect [\(frame.minX) \(bottom) \(frame.maxX) \(bottom + frame.height)] \(entries) >>
+            """)
+    }
+
     func add(to builder: PDFBuilder) {
         let fonts = Font.allCases
             .map { "/\($0.resourceName) << /Type /Font /Subtype /Type1 /BaseFont /\($0.rawValue) >>" }
             .joined(separator: " ")
         builder.addPage(
             resources: "/Font << \(fonts) >>", content: Data(content.utf8),
-            mediaBox: "0 0 \(Int(Self.size.width)) \(Int(Self.size.height))")
+            options: PDFBuilder.PageOptions(
+                mediaBox: "0 0 \(Int(Self.size.width)) \(Int(Self.size.height))",
+                annotations: fields.map(builder.addFormField)))
     }
 
     /// Builds a PDF from the pages and extracts each page's blocks.
