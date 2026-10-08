@@ -9,7 +9,7 @@ struct StatBlockKindTests {
     /// Enough body text that its typeface, not the stat block's, is the document's main one.
     private static let bodyLines = (1...18).map { "Body text line number \($0)" } + ["and then it stops here."]
 
-    /// A chase obstacle: underlined header, one labelled entry with a hanging line, a rule, then
+    /// A chase obstacle: underlined header, one labeled entry with a hanging line, a rule, then
     /// a description without a label.
     private func drawObstacle(on page: inout Page, type: String, underlined: Bool) {
         let left = Page.leftColumn
@@ -24,7 +24,7 @@ struct StatBlockKindTests {
         page.lines(Self.bodyLines, x: Page.rightColumn, top: 100)
     }
 
-    @Test("A chase obstacle is a stat block: a labelled entry, then its description after the rule")
+    @Test("A chase obstacle is a stat block: a labeled entry, then its description after the rule")
     func chaseObstacle() throws {
         let blocks = try Page.blocks { drawObstacle(on: &$0, type: "OBSTACLE 1", underlined: true) }
         guard case .statBlock(let block) = try #require(blocks.first) else {

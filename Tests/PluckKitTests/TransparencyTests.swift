@@ -2,7 +2,7 @@ import Foundation
 @testable import PluckKit
 import Testing
 
-@Suite("Honouring transparency")
+@Suite("Honoring transparency")
 struct TransparencyTests {
     private static let fourReds = Array(repeating: Color.red, count: 4).flatMap { $0 }
 
@@ -16,7 +16,7 @@ struct TransparencyTests {
         let image = try #require(page.rasters.first)
         #expect(image.alphas == [0, 85, 170, 255])
         #expect(image.pixel(1, 1) == Color.red + [255])
-        #expect(Array(image.pixel(1, 0).prefix(3)) == Color.red, "colour under partial alpha is not premultiplied")
+        #expect(Array(image.pixel(1, 0).prefix(3)) == Color.red, "color under partial alpha is not premultiplied")
     }
 
     @Test("A soft mask of a different resolution is resampled to the image")
@@ -57,7 +57,7 @@ struct TransparencyTests {
         #expect(try #require(page.rasters.first).alphas == [255, 0, 0, 255])
     }
 
-    @Test("A colour-key mask makes the keyed colour transparent")
+    @Test("A color-key mask makes the keyed color transparent")
     func colorKeyMask() throws {
         let page = try ExtractedPage.single {
             $0.addRGBImage(

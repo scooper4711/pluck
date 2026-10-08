@@ -15,7 +15,7 @@ public struct PageScanResult: Sendable {
     public var failureCount = 0
 }
 
-/// Extracts images from one PDF. Safe to call from any thread; calls are serialised.
+/// Extracts images from one PDF. Safe to call from any thread; calls are serialized.
 public final class PDFImageSource: @unchecked Sendable {
     public static let thumbnailDimension = 400
 
@@ -34,7 +34,7 @@ public final class PDFImageSource: @unchecked Sendable {
         pageCount = document.numberOfPages
     }
 
-    /// Finds, decodes and summarises every image painted by a page.
+    /// Finds, decodes and summarizes every image painted by a page.
     public func scanPage(at pageIndex: Int) -> PageScanResult {
         lock.withLock {
             var result = PageScanResult()

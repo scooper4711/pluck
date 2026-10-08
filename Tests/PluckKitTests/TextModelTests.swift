@@ -45,7 +45,7 @@ struct TextModelTests {
             """)
     }
 
-    @Test("Selecting pages narrows the text, and only neighbouring pages are joined")
+    @Test("Selecting pages narrows the text, and only neighboring pages are joined")
     func pageSelection() async throws {
         try await openSample()
 

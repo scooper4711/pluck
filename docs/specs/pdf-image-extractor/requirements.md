@@ -31,7 +31,7 @@ image inside it for copying, dragging out, or exporting as WebP.
   from the page.
 - R3.2 Only images a page actually paints are attributed to it, including
   those painted through form XObjects, tiling patterns and inline images.
-- R3.3 Transparency is honoured: soft masks, stencil masks, colour-key masks
+- R3.3 Transparency is honored: soft masks, stencil masks, color-key masks
   and stencil images all produce an alpha channel.
 - R3.3a Colors match the page: CMYK images, JPEG-compressed ones included,
   follow the image's color space and `Decode` array, so none comes out as a

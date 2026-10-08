@@ -49,7 +49,7 @@ struct TextPage {
         return top + CGFloat(texts.count) * Self.leading
     }
 
-    /// Fills a grey panel whose top edge is `top` points down the page.
+    /// Fills a gray panel whose top edge is `top` points down the page.
     mutating func panel(x: CGFloat, top: CGFloat, width: CGFloat, height: CGFloat) {
         content += "0.8 g \(x) \(Self.size.height - top - height) \(width) \(height) re f 0 g\n"
     }

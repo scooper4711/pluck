@@ -52,13 +52,13 @@ extension RasterImage {
     }
 }
 
-/// Whether two pixels match within a tolerance, for lossy or colour-managed paths.
+/// Whether two pixels match within a tolerance, for lossy or color-managed paths.
 func isClose(_ actual: [UInt8], _ expected: [UInt8], tolerance: Int = 12) -> Bool {
     actual.count == expected.count && zip(actual, expected).allSatisfy { abs(Int($0) - Int($1)) <= tolerance }
 }
 
 enum Fixture {
-    /// JPEG data for a solid-colour image.
+    /// JPEG data for a solid-color image.
     static func jpeg(color: [UInt8], width: Int, height: Int) throws -> Data {
         let pixels = Array(repeating: color + [255], count: width * height).flatMap { $0 }
         let image = try RasterImage(width: width, height: height, pixels: Data(pixels)).makeCGImage()

@@ -20,7 +20,7 @@ read-only text view.
    must lie wholly inside and fill the candidate, which separates a sidebar's
    background from an illustration that text merely wraps around. Rules that
    fence mixed text (list rows) are ignored. A lone rule closes or opens a
-   callout that continues on the neighbouring page.
+   callout that continues on the neighboring page.
 4. **`ColumnAnalyzer`** orders the loose fragments and the boxes (as single
    items) by finding gutters: vertical strips separating items that stand
    side by side. Items crossing a gutter either have a band to themselves
@@ -55,7 +55,7 @@ initiative) has the same header as a stat block; a block of a known type must
 contain one of Perception, AC, HP, Stealth, Disable or Chase Points to count.
 A header of an unknown type must be underlined instead.
 
-The rules inside a block divide its sections, so unlabelled text straight
+The rules inside a block divide its sections, so unlabeled text straight
 after one starts a description entry rather than continuing the entry above.
 When the document's body text shares the stat blocks' typeface, a block is
 only continued into the next column if it was visibly cut off: it ended on a

@@ -27,8 +27,8 @@ A Swift package with three targets:
    mean what they say unless the image's `Decode` array inverts them, so such
    images are rebuilt from ImageIO's samples in the PDF's color space with that
    `Decode` array (otherwise they come out as negatives). Raw samples are wrapped in a `CGImage` using the parsed
-   colour space (`PDFColorSpaceParser`), bit depth and `Decode` array. The
-   alpha channel comes from `SMask`, a stencil `Mask` stream, a colour-key
+   color space (`PDFColorSpaceParser`), bit depth and `Decode` array. The
+   alpha channel comes from `SMask`, a stencil `Mask` stream, a color-key
    `Mask` array, or the image being a stencil itself.
 3. **De-duplicate** (`ImageLibrary`) — the image identity is the SHA-256 of
    its decoded pixels. The library keeps one `ExtractedImage` per identity and
@@ -89,7 +89,7 @@ selection and multi-item drag with file promises.
 
 ## Known limits
 
-- Separation/DeviceN colour spaces are approximated (tint functions are not
+- Separation/DeviceN color spaces are approximated (tint functions are not
   evaluated).
 - Soft-mask `Matte` pre-blending is not undone.
 - Images inside Type 3 fonts and annotations are not reported.

@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-/// A PDF colour space translated to Core Graphics.
+/// A PDF color space translated to Core Graphics.
 struct PDFColorSpace {
     let cgColorSpace: CGColorSpace
     /// True when samples are ink amounts standing in for a Separation/DeviceN space,
@@ -18,7 +18,7 @@ struct PDFColorSpace {
 struct PDFColorSpaceParser {
     private static let maximumNesting = 4
 
-    /// Resolves a colour space named in a content stream's resources; only inline images need it.
+    /// Resolves a color space named in a content stream's resources; only inline images need it.
     var namedResource: (String) -> PDFObject? = { _ in nil }
 
     func parse(_ object: PDFObject) throws -> PDFColorSpace {
@@ -26,10 +26,10 @@ struct PDFColorSpaceParser {
     }
 
     private func parse(_ object: PDFObject, nesting: Int) throws -> PDFColorSpace {
-        guard nesting < Self.maximumNesting else { throw unsupported("colour spaces nested too deeply") }
+        guard nesting < Self.maximumNesting else { throw unsupported("color spaces nested too deeply") }
         if let name = object.name { return try namedSpace(name, nesting: nesting) }
         guard let array = object.array, let family = array[0]?.name else {
-            throw unsupported("malformed colour space")
+            throw unsupported("malformed color space")
         }
         switch family {
         case "ICCBased": return try iccBased(array, nesting: nesting)
@@ -48,7 +48,7 @@ struct PDFColorSpaceParser {
         case "DeviceRGB", "RGB", "CalRGB": return PDFColorSpace(cgColorSpace: .standardRGB)
         case "DeviceCMYK", "CMYK": return PDFColorSpace(cgColorSpace: CGColorSpaceCreateDeviceCMYK())
         default:
-            guard let resource = namedResource(name) else { throw unsupported("colour space \(name)") }
+            guard let resource = namedResource(name) else { throw unsupported("color space \(name)") }
             return try parse(resource, nesting: nesting + 1)
         }
     }
@@ -58,13 +58,13 @@ struct PDFColorSpaceParser {
         case 1: PDFColorSpace(cgColorSpace: CGColorSpaceCreateDeviceGray())
         case 3: PDFColorSpace(cgColorSpace: .standardRGB)
         case 4: PDFColorSpace(cgColorSpace: CGColorSpaceCreateDeviceCMYK())
-        default: throw unsupported("colour space with \(componentCount) components")
+        default: throw unsupported("color space with \(componentCount) components")
         }
     }
 
     private func iccBased(_ array: PDFArray, nesting: Int) throws -> PDFColorSpace {
         guard let stream = array[1]?.stream, let componentCount = stream.dictionary?.object("N")?.integer else {
-            throw unsupported("ICC colour space without a profile")
+            throw unsupported("ICC color space without a profile")
         }
         if let profile = stream.data()?.bytes, let space = CGColorSpace(iccData: profile),
            space.numberOfComponents == componentCount {
@@ -80,7 +80,7 @@ struct PDFColorSpaceParser {
     private func indexed(_ array: PDFArray, nesting: Int) throws -> PDFColorSpace {
         guard let baseObject = array[1], let lastIndex = array[2]?.integer, (0...255).contains(lastIndex),
               let lookup = array[3], var table = lookup.bytes ?? (lookup.stream?.data()?.bytes as Data?)
-        else { throw unsupported("malformed indexed colour space") }
+        else { throw unsupported("malformed indexed color space") }
         let base = try parse(baseObject, nesting: nesting + 1)
         let requiredLength = (lastIndex + 1) * base.componentCount
         if table.count < requiredLength { table.append(Data(count: requiredLength - table.count)) }
@@ -89,7 +89,7 @@ struct PDFColorSpaceParser {
                 indexedBaseSpace: base.cgColorSpace, last: lastIndex,
                 colorTable: bytes.bindMemory(to: UInt8.self).baseAddress!)
         }
-        guard let space else { throw unsupported("indexed colour space Core Graphics rejects") }
+        guard let space else { throw unsupported("indexed color space Core Graphics rejects") }
         return PDFColorSpace(cgColorSpace: space)
     }
 
@@ -106,14 +106,14 @@ struct PDFColorSpaceParser {
     }
 
     /// Approximates a Separation/DeviceN space without evaluating its tint function:
-    /// a single ink is drawn as grey, and inks that line up with the alternate space use it directly.
+    /// a single ink is drawn as gray, and inks that line up with the alternate space use it directly.
     private func inkFallback(componentCount: Int, alternate: PDFObject?, nesting: Int) throws -> PDFColorSpace {
         if componentCount == 1 {
             return PDFColorSpace(cgColorSpace: CGColorSpaceCreateDeviceGray(), isInkAmount: true)
         }
         guard let alternate, let space = try? parse(alternate, nesting: nesting + 1),
               space.componentCount == componentCount
-        else { throw unsupported("\(componentCount)-ink colour space") }
+        else { throw unsupported("\(componentCount)-ink color space") }
         return space
     }
 

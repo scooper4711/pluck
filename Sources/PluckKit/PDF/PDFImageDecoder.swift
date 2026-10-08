@@ -11,7 +11,7 @@ struct PDFImageInfo {
     let dictionary: PDFDictionary
     let width: Int
     let height: Int
-    /// A stencil carries one bit of coverage per pixel and no colour of its own.
+    /// A stencil carries one bit of coverage per pixel and no color of its own.
     let isStencil: Bool
     let bitsPerComponent: Int
 
@@ -44,7 +44,7 @@ struct PDFImageDecoder {
         return image
     }
 
-    /// A stencil image is painted in the current fill colour; on its own it is black on clear.
+    /// A stencil image is painted in the current fill color; on its own it is black on clear.
     private func stencilImage(_ info: PDFImageInfo) throws -> RasterImage {
         let plane = try RasterImage.grayPlane(of: baseImage(info), width: info.width, height: info.height)
         var pixels = Data(count: plane.count * RasterImage.bytesPerPixel)
@@ -115,17 +115,17 @@ struct PDFImageDecoder {
     private func colorSpace(of info: PDFImageInfo) throws -> PDFColorSpace {
         if info.isStencil { return PDFColorSpace(cgColorSpace: CGColorSpaceCreateDeviceGray()) }
         guard let object = info.dictionary.object("ColorSpace", "CS") else {
-            throw PluckError.unsupportedImage(reason: "no colour space")
+            throw PluckError.unsupportedImage(reason: "no color space")
         }
         return try colorSpaceParser.parse(object)
     }
 
-    /// The `Decode` ranges to hand Core Graphics; empty means "use the colour space's defaults".
+    /// The `Decode` ranges to hand Core Graphics; empty means "use the color space's defaults".
     private func decodeArray(for info: PDFImageInfo, space: PDFColorSpace) -> [CGFloat] {
         let declared = info.dictionary.object("Decode", "D")?.array?.numbers ?? []
         let isUsable = declared.count == space.componentCount * 2
         guard space.isInkAmount else { return isUsable ? declared : [] }
-        // More ink is darker, so the grey stand-in reads each range backwards.
+        // More ink is darker, so the gray stand-in reads each range backwards.
         return isUsable ? [declared[1], declared[0]] : [1, 0]
     }
 
