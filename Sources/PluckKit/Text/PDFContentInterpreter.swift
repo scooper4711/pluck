@@ -77,7 +77,7 @@ extension PDFContentInterpreter {
         state.fillsWhite = !components.isEmpty && components.allSatisfy { abs($0 - blank) < 0.02 }
     }
 
-    /// `sc`/`scn` do not say which colour space they are in; three components are taken as RGB
+    /// `sc`/`scn` do not say which color space they are in; three components are taken as RGB
     /// and four as CMYK. Anything else (a tint, a pattern) is assumed to be visible.
     func setGenericFillColor(_ operands: PDFOperands) {
         _ = operands.name()

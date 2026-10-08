@@ -117,7 +117,7 @@ private final class ThumbnailView: NSView {
         NSBezierPath(rect: frame.insetBy(dx: -0.5, dy: -0.5)).stroke()
     }
 
-    /// Centres the image, shrinking it to fit but never enlarging it past its own pixels.
+    /// Centers the image, shrinking it to fit but never enlarging it past its own pixels.
     private func fittedFrame(for image: CGImage) -> NSRect {
         let size = NSSize(width: image.width, height: image.height)
         let scale = min(bounds.width / size.width, bounds.height / size.height, 1)

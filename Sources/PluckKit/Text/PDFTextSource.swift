@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 import PDFKit
 
-/// Extracts structured text from one PDF. Safe to call from any thread; calls are serialised.
+/// Extracts structured text from one PDF. Safe to call from any thread; calls are serialized.
 public final class PDFTextSource: @unchecked Sendable {
     /// How many pages are sampled to learn the body font and the running headers and footers.
     private static let sampleSize = 24

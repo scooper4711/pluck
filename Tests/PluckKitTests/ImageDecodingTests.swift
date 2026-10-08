@@ -18,7 +18,7 @@ struct ImageDecodingTests {
         #expect(image.pixel(1, 1) == Color.white + [255])
     }
 
-    @Test("Grey samples keep their exact values")
+    @Test("Gray samples keep their exact values")
     func rawGray() throws {
         let page = try ExtractedPage.single { $0.addGrayImage(width: 3, height: 1, samples: [0, 128, 255]) }
 
@@ -28,7 +28,7 @@ struct ImageDecodingTests {
         #expect(image.pixel(2, 0) == [255, 255, 255, 255])
     }
 
-    @Test("One-bit images honour row padding and the Decode array")
+    @Test("One-bit images honor row padding and the Decode array")
     func oneBitWithDecode() throws {
         let page = try ExtractedPage.single {
             $0.addImage(
@@ -54,7 +54,7 @@ struct ImageDecodingTests {
         #expect(isClose(try #require(page.rasters.first).pixel(0, 0), [255, 0, 128, 255], tolerance: 1))
     }
 
-    @Test("Indexed colour looks samples up in the palette")
+    @Test("Indexed color looks samples up in the palette")
     func indexed() throws {
         let page = try ExtractedPage.single {
             $0.addImage(
@@ -80,7 +80,7 @@ struct ImageDecodingTests {
         #expect(isClose(image.pixel(1, 0), Color.black + [255], tolerance: 60))
     }
 
-    @Test("A Separation ink is approximated as grey, with full ink dark")
+    @Test("A Separation ink is approximated as gray, with full ink dark")
     func separation() throws {
         let page = try ExtractedPage.single { builder in
             let tint = builder.addObject("<< /FunctionType 2 /Domain [0 1] /C0 [1] /C1 [0] /N 1 >>")
@@ -127,7 +127,7 @@ struct ImageDecodingTests {
         #expect(isClose(plainPixel, expectedStored), "\(plainPixel) should be \(expectedStored)")
     }
 
-    @Test("An image with an unusable colour space is counted, not fatal")
+    @Test("An image with an unusable color space is counted, not fatal")
     func undecodable() throws {
         let builder = PDFBuilder()
         let broken = builder.addImage(

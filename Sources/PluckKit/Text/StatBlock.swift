@@ -2,7 +2,7 @@ import Foundation
 
 /// A creature or hazard stat block in the Pathfinder Second Edition layout.
 public struct StatBlock: Equatable, Sendable, Codable {
-    /// One labelled line of the block, such as `Perception +6; darkvision`.
+    /// One labeled line of the block, such as `Perception +6; darkvision`.
     public struct Entry: Equatable, Sendable, Codable {
         /// The bold label that opens the entry: `Perception`, `AC`, `Melee`.
         public var name: String
@@ -19,12 +19,12 @@ public struct StatBlock: Equatable, Sendable, Codable {
 
     /// The name as printed, usually in capitals: `GWIBBLE`.
     public var name: String
-    /// The kind and level, normalised: `Creature 1`, `Hazard 3`.
+    /// The kind and level, normalized: `Creature 1`, `Hazard 3`.
     public var level: String
     /// The trait boxes as printed: rarity, alignment, size, then the rest.
     public var traits: [String]
     public var entries: [Entry]
-    /// The subtier the block belongs to in an organised-play scenario, such as `1-2`.
+    /// The subtier the block belongs to in an organized-play scenario, such as `1-2`.
     public var variant: String?
     /// The document the block came from.
     public var source: String?

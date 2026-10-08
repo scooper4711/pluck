@@ -6,3 +6,4 @@ tmp/
 xcuserdata/
 DerivedData/
 .DS_Store
+coverage/

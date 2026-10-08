@@ -71,7 +71,7 @@ public struct RasterImage: Equatable, Sendable {
         }
     }
 
-    /// Renders any image as an 8-bit grey plane, resampling it to the requested size.
+    /// Renders any image as an 8-bit gray plane, resampling it to the requested size.
     static func grayPlane(of image: CGImage, width: Int, height: Int) throws -> Data {
         var plane = Data(count: width * height)
         try plane.withUnsafeMutableBytes { buffer in
@@ -79,14 +79,14 @@ public struct RasterImage: Equatable, Sendable {
                 data: buffer.baseAddress, width: width, height: height, bitsPerComponent: 8,
                 bytesPerRow: width, space: CGColorSpaceCreateDeviceGray(),
                 bitmapInfo: CGImageAlphaInfo.none.rawValue)
-            else { throw PluckError.renderingFailed(operation: "creating a grey canvas") }
+            else { throw PluckError.renderingFailed(operation: "creating a gray canvas") }
             context.interpolationQuality = image.width == width && image.height == height ? .none : .high
             context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
         }
         return plane
     }
 
-    /// Grey images are expanded by hand so their sample values survive unchanged.
+    /// Gray images are expanded by hand so their sample values survive unchanged.
     private static func expandingGray(_ image: CGImage) throws -> RasterImage {
         let plane = try grayPlane(of: image, width: image.width, height: image.height)
         var pixels = Data(count: plane.count * bytesPerPixel)

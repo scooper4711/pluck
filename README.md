@@ -1,58 +1,125 @@
 # Pluck
 
+[![CI](https://github.com/scooper4711/pluck/actions/workflows/ci.yml/badge.svg)](https://github.com/scooper4711/pluck/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=scooper4711_pluck&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=scooper4711_pluck)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=scooper4711_pluck&metric=coverage)](https://sonarcloud.io/summary/new_code?id=scooper4711_pluck)
+[![GitHub Release](https://img.shields.io/github/v/release/scooper4711/pluck)](https://github.com/scooper4711/pluck/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/scooper4711/pluck/total)](https://github.com/scooper4711/pluck/releases)
+[![Platform](https://img.shields.io/badge/platform-macOS%2015%2B-informational)](#requirements)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 <img src="Resources/AppIcon.png" width="128" alt="Pluck icon">
 
-A native macOS utility that opens a PDF and offers up every image inside it.
+A Mac app that opens a PDF and offers up every image inside it, and its text too.
 
-- **Page navigator** — thumbnails of every page down the left. Select one or
-  more pages to see only their images; select none to see them all.
-- **Real images** — extracted at their native resolution with transparency
-  intact (soft masks, stencil masks, colour-key masks), not re-rendered.
-- **No duplicates** — an image repeated across pages (borders, backgrounds)
-  is shown once, labelled with how many pages use it.
-- **Text too** — switch the main view to Text (⌘2) for the selected pages' text in reading
-  order: columns untangled, info boxes and read-aloud passages set apart, each paragraph on
-  one line, bold and italic kept. Plain text, Markdown or HTML; select and copy, Copy All,
-  or export. HTML is shown rendered but copies as markup.
-- **Pathfinder stat blocks** — recognised and written as Fantasy Statblocks YAML in
-  Markdown, and as structured HTML.
-- **Stat blocks for other apps** — the stat blocks on the shown pages are listed above the
-  text: click one to copy it, drag it out, or Copy All Stat Blocks (⌥⌘C). Apps such as
-  Combat Pad get the structured block; every other app gets plain text.
-- **Several PDFs at once** — each in its own window, with File ▸ Open Recent.
-- **See it in context** — right-click an image and choose Show Page in Sidebar to scroll
-  the navigator to the page it is on, without changing which pages are selected.
-- **Multi-select** — click, ⌘/⇧-click, rubber-band or ⌘A.
-- **Rotate and flip** — ⌘L / ⌘R and the Image menu; edits carry through to
-  whatever leaves the app.
-- **Get them out** — ⌘C copies (PNG/TIFF), dragging to Finder drops `.webp`
-  files, and ⌘E / ⇧⌘E exports the selection or everything shown as WebP.
-- **Settings** (⌘,) — WebP quality, or lossless.
+Getting a picture out of a PDF usually means a screenshot: the wrong size, a background where it should be
+transparent, and a page edge cutting it off. Pluck reads the images the PDF actually contains, at their own
+resolution and with their transparency, so a creature's art from an adventure comes out as the creature
+alone, ready for a token, a custom pawn in [Pawn Shop](https://github.com/scooper4711/pawn-shop) or a
+virtual tabletop. It also reads the text in reading order, and turns Pathfinder stat blocks into data other
+apps can use.
 
-## Build
+It is free, and it works with any PDF you open; it contains no content of its own.
 
-Requires Xcode 16 or later on macOS 15 or later.
+## Features
+
+- **Page navigator:** thumbnails of every page down the left. Select one or more pages to see only their
+  images; select none to see them all.
+- **Real images:** extracted at their native resolution with transparency intact (soft masks, stencil masks,
+  color-key masks), not re-rendered.
+- **No duplicates:** an image repeated across pages (borders, backgrounds) is shown once, labeled with how
+  many pages use it.
+- **Text too:** switch the main view to Text (⌘2) for the selected pages' text in reading order: columns
+  untangled, info boxes and read-aloud passages set apart, each paragraph on one line, bold and italic kept.
+  Plain text, Markdown or HTML; select and copy, Copy All, or export. HTML is shown rendered but copies as
+  markup.
+- **Pathfinder stat blocks:** recognized and written as
+  [Fantasy Statblocks](https://github.com/javalent/fantasy-statblocks) YAML in Markdown, and as structured
+  HTML.
+- **Stat blocks for other apps:** the stat blocks on the shown pages are listed above the text: click one to
+  copy it, drag it out, or Copy All Stat Blocks (⌥⌘C). Apps that read Pluck's stat block format get the
+  structured block; every other app gets plain text.
+- **Several PDFs at once:** each in its own window, with File › Open Recent.
+- **See it in context:** right-click an image and choose Show Page in Sidebar to scroll the navigator to the
+  page it is on, without changing which pages are selected.
+- **Multi-select:** click, ⌘-click or ⇧-click, drag a selection rectangle, or press ⌘A.
+- **Rotate and flip:** ⌘L and ⌘R and the Image menu; edits carry through to whatever leaves the app.
+- **Get them out:** ⌘C copies (PNG and TIFF), dragging to Finder drops `.webp` files, and ⌘E or ⇧⌘E exports
+  the selection or everything shown as WebP.
+- **Settings** (⌘,): WebP quality, or lossless.
+
+## Requirements
+
+macOS 15 or later.
+
+## Installing a release
+
+Download the disk image from the [releases page](https://github.com/scooper4711/pluck/releases), open it and
+drag Pluck to Applications.
+
+The app is not notarized by Apple, so macOS blocks it the first time:
+
+1. Open Pluck once. macOS says it cannot be opened; click Done.
+2. Open System Settings › Privacy & Security and scroll down to the message about Pluck.
+3. Click Open Anyway and confirm.
+
+After that it opens normally.
+
+## Supporting the project
+
+The app is free and always will be. If it saves you time and you would like to say thanks, you can leave a
+tip on [Ko-fi](https://ko-fi.com/coop207627). A donation is entirely optional and unlocks nothing.
+
+## Building
 
 ```sh
-scripts/build-app.sh             # builds dist/Pluck.app
-scripts/build-app.sh --install   # ...and copies it to /Applications
+make app      # builds dist/Pluck.app
+make run      # builds and launches the app
+make install  # builds the app and moves it to /Applications
+make test     # runs the unit tests
+make lint     # runs SwiftLint
+make coverage # runs the tests and enforces the coverage threshold
+make dmg      # packages the app into a disk image
+make icon     # redraws Resources/AppIcon.icns
 ```
 
-`swift run Pluck` runs it unbundled for development.
+Building needs Xcode 16 or later (Swift 6 toolchain). The app is ad-hoc signed. `swift run Pluck` runs it
+unbundled for development.
 
-## Test
+The tests write their own PDFs object by object (`Tests/PluckKitTests/Support/PDFBuilder.swift`), so every
+color space, mask type and nesting case is exercised deterministically.
 
-```sh
-swift test
-swiftlint --strict
-```
+The code is in two parts:
 
-The tests write their own PDFs object by object (`Tests/PluckKitTests/Support/PDFBuilder.swift`),
-so every colour space, mask type and nesting case is exercised deterministically.
+- `Sources/PluckKit`: extraction, de-duplication, edits, encoding, export and the `PluckModel`; unit tested.
+- `Sources/Pluck`: the SwiftUI and AppKit app.
 
-## Layout
+## Documentation
 
-- `Sources/PluckKit` — extraction, de-duplication, edits, encoding, export and the `PluckModel`.
-- `Sources/Pluck` — the SwiftUI/AppKit shell.
-- `scripts/make-icon.sh` — regenerates the icon from `scripts/make-icon.swift`.
-- `docs/specs` — requirements and design, with known limits, for images and for text.
+The requirements and design, with known limits, are in [`docs/specs`](docs/specs): one for images and one
+for text.
+
+## Regarding the use of AI
+
+I used AI as a coding assistant while building this. I'm a software engineer with decades of professional
+experience. I could have written every line myself, but AI let me move faster. I drove the architecture and
+design decisions, followed industry best practices for code quality, and made sure everything is
+human-readable and maintainable. The project has SonarCloud quality gates and a full test suite that must pass
+before any release.
+
+Think of it like driving a car instead of walking. I plan the route, decide the stops along the way, and AI
+gets me to the destination faster than I could on foot. But I'm still the one behind the wheel.
+
+If you don't want to use tools written with AI assistance, then I respect that decision. That's why I'm
+transparent about it. You can make up your own mind.
+
+## License
+
+Pluck is released under the [MIT license](LICENSE). It encodes WebP with Google's
+[libwebp](https://chromium.googlesource.com/webm/libwebp), under its BSD license, through
+[libwebp-Xcode](https://github.com/SDWebImage/libwebp-Xcode).
+
+## Trademarks
+
+Pathfinder is a trademark of Paizo Inc. Pluck is an independent project. It is not published, endorsed, or
+specifically approved by Paizo, and it contains no Paizo content.

@@ -16,7 +16,7 @@ that plain copy-and-paste from Preview or Acrobat loses.
   outlined panel, and passages fenced by rules (read-aloud text).
 - R2.4 A paragraph is one line, however many lines, columns or pages it
   spanned. A word hyphenated at a line end is mended; a real hyphen is kept.
-- R2.5 Headings are recognised by type size, and bold and italic runs by the
+- R2.5 Headings are recognized by type size, and bold and italic runs by the
   fonts the PDF actually uses.
 - R2.6 Running headers, footers and page numbers are left out. Text that
   recurs inside the text area, such as a sidebar repeated with each encounter,
@@ -27,16 +27,16 @@ that plain copy-and-paste from Preview or Acrobat loses.
   symbols (◆, ◆◆, ◆◆◆, ⤾, ◇) in HTML and plain text.
 
 ## R4 Pathfinder stat blocks
-- R4.1 A stat block is recognised by its header line, in capitals: a name on
+- R4.1 A stat block is recognized by its header line, in capitals: a name on
   the left and a type and level on the right (`CREATURE 2`, `HAZARD 3`,
   `OBSTACLE 1`, `LEVEL –1`). Creatures, hazards and chase obstacles are known
   types; any other type counts when the header is underlined. Trait boxes and
-  bold-labelled entries follow. The block is kept as one, including when it carries on in the next column or wraps
+  bold-labeled entries follow. The block is kept as one, including when it carries on in the next column or wraps
   around an illustration.
 - R4.5 A blank line ends a stat block, whatever follows it looks like.
 - R4.6 Text without a label, after a rule or at the left edge, is the block's
   description (a chase obstacle's flavour text, or "Variant pirate") and is
-  kept as an unlabelled entry, including when it starts the next column.
+  kept as an unlabeled entry, including when it starts the next column.
 - R4.2 Markdown writes it as a `statblock` code block for the Obsidian plugin
   Fantasy Statblocks in its Basic Pathfinder 2e Layout, following the
   conventions of the user's vault (rarity in `rare_03`, alignment written as
@@ -44,7 +44,7 @@ that plain copy-and-paste from Preview or Acrobat loses.
 - R4.3 HTML writes it as `div.statblock` with a heading, a trait list, a
   paragraph per entry and a rule between sections. Plain text lists the
   entries one per line.
-- R4.4 In an organised-play scenario the subtier named by the heading above
+- R4.4 In an organized-play scenario the subtier named by the heading above
   is appended to the name, as in `Gwibble (1-2)`.
 - R4.7 The stat blocks on the shown pages are listed above the text. Clicking
   one copies it; it can also be dragged into another app, and Copy All Stat

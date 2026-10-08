@@ -55,8 +55,8 @@ struct StatBlockParser {
     }
 
     /// Text without a label starts an entry of its own when it comes straight after a rule, or
-    /// stands at the left edge where a labelled entry's other lines would hang indented.
-    /// Further lines of the same unlabelled text are not new entries.
+    /// stands at the left edge where a labeled entry's other lines would hang indented.
+    /// Further lines of the same unlabeled text are not new entries.
     private func opensDescription(
         _ line: TextFragment, leftEdge: CGFloat, followsRule: Bool, after entry: [TextRun]?
     ) -> Bool {

@@ -2,7 +2,7 @@ import Foundation
 @testable import PluckKit
 import Testing
 
-@Suite("Recognising Pathfinder stat blocks")
+@Suite("Recognizing Pathfinder stat blocks")
 struct StatBlockTests {
     private typealias Page = TextPage
 
@@ -57,7 +57,7 @@ struct StatBlockTests {
         return statBlock
     }
 
-    @Test("A stat block is read as name, level, traits and labelled entries")
+    @Test("A stat block is read as name, level, traits and labeled entries")
     func structure() throws {
         let block = try gwibble()
 
@@ -251,7 +251,7 @@ struct StatBlockTests {
         #expect(block.entries.first?.text == "Variant rigger (NPC Core 147)")
     }
 
-    @Test("Level labels are normalised, and negative levels keep their sign")
+    @Test("Level labels are normalized, and negative levels keep their sign")
     func levels() {
         #expect(StatBlockParser.level(from: "LEVEL –1") == "Creature -1")
         #expect(StatBlockParser.level(from: "CREATURE 12") == "Creature 12")

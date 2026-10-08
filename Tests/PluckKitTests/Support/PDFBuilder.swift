@@ -102,7 +102,7 @@ final class PDFBuilder {
 }
 
 extension PDFBuilder {
-    /// Adds an image XObject; `entries` supplies colour space, bit depth, masks and filters.
+    /// Adds an image XObject; `entries` supplies color space, bit depth, masks and filters.
     @discardableResult
     func addImage(width: Int, height: Int, entries: String, data: Data) -> Int {
         addStream("/Type /XObject /Subtype /Image /Width \(width) /Height \(height) \(entries)", data: data)
@@ -122,7 +122,7 @@ extension PDFBuilder {
             entries: "/ColorSpace /DeviceGray /BitsPerComponent 8 \(entries)", data: Data(samples))
     }
 
-    /// A one-colour RGB image, handy when a test only needs distinguishable pictures.
+    /// A one-color RGB image, handy when a test only needs distinguishable pictures.
     @discardableResult
     func addSolidImage(_ color: [UInt8], width: Int = 4, height: Int = 4) -> Int {
         let samples = Array(repeating: color, count: width * height).flatMap { $0 }

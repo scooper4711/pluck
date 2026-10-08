@@ -9,7 +9,7 @@ struct ImageEncodingTests {
         [[0, 0, 255, 255], [0, 0, 0, 0]]
     ])
 
-    @Test("Lossless WebP reproduces colour and alpha exactly")
+    @Test("Lossless WebP reproduces color and alpha exactly")
     func losslessWebP() throws {
         let data = try WebPEncoder.encode(Self.sample, options: WebPOptions(isLossless: true))
         let decoded = try RasterImage(webP: data)
