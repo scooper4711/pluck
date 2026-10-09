@@ -21,6 +21,11 @@ apps can use.
 
 It is free, and it works with any PDF you open; it contains no content of its own.
 
+![The Pluck window: page thumbnails on the left and the seven illustrations from a three-page PDF in a grid, each with its size and page](docs/images/screenshot.png)
+
+*A three-page sample adventure opened in Pluck: every illustration at its own resolution, with the page it
+is on. The art is public domain (see [Sample art](#sample-art)).*
+
 ## Features
 
 - **Page navigator:** thumbnails of every page down the left. Select one or more pages to see only their
@@ -127,6 +132,24 @@ gets me to the destination faster than I could on foot. But I'm still the one be
 
 If you don't want to use tools written with AI assistance, then I respect that decision. That's why I'm
 transparent about it. You can make up your own mind.
+
+## Sample art
+
+The sample PDF in the screenshot was made for this README. Its text is original, and its illustrations are
+public domain, from Wikimedia Commons:
+
+- Merlin, King Arthur and Sir Gawaine: Howard Pyle, *The Story of King Arthur and His Knights* (1903)
+  ([1](https://commons.wikimedia.org/wiki/File:Arthur-Pyle_The_Enchanter_Merlin.JPG),
+  [2](https://commons.wikimedia.org/wiki/File:Arthur-Pyle_King_Arthur_of_Britain.JPG),
+  [3](https://commons.wikimedia.org/wiki/File:Arthur-Pyle_Sir_Gawaine_the_Son_of_Lot,_King_of_Orkney.JPG))
+- Baba Yaga: Ivan Bilibin, 1900
+  ([source](https://commons.wikimedia.org/wiki/File:Bilibin._Baba_Yaga.jpg))
+- Jabberwock: John Tenniel, *Through the Looking-Glass* (1871)
+  ([source](https://commons.wikimedia.org/wiki/File:Jabberwocky.jpg))
+- Cave Troll: John Bauer, *Bland tomtar och troll* (1912), Nationalmuseum, Stockholm
+  ([source](https://commons.wikimedia.org/wiki/File:John_Bauer_-_%22Ho,_What_a_Pipsqueak%5E_Said_the_Troll%22,_Bland_tomtar_och_troll,_1912_-_NMH_118-1982_-_Nationalmuseum.jpg))
+- Welsh Giant: Arthur Rackham, *The Allies' Fairy Book* (1916)
+  ([source](https://commons.wikimedia.org/wiki/File:At_the_dead_time_of_the_night_in_came_the_Welsh_Giant.jpg))
 
 ## License
 
