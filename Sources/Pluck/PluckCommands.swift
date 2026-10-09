@@ -53,6 +53,7 @@ struct SettingsView: View {
     @AppStorage(WebPOptions.losslessDefaultsKey) private var isLossless = false
     @AppStorage(WebPOptions.qualityDefaultsKey) private var quality = WebPOptions.defaultQuality
     @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
+    @AppStorage(AppUpdater.checksAtLaunchKey) private var checksForUpdatesAtLaunch = true
 
     var body: some View {
         Form {
@@ -69,6 +70,13 @@ struct SettingsView: View {
             Section("Text") {
                 Toggle("Write Markdown info boxes as Obsidian callouts", isOn: $usesObsidianCallouts)
                 Text("Off: a plain block quote. On: “> [!info] Title”, and “> [!quote]” for read-aloud text.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Updates") {
+                Toggle("Check for updates when Pluck opens", isOn: $checksForUpdatesAtLaunch)
+                Text("Pluck asks GitHub whether a newer version has been released, and tells you only when there "
+                     + "is one. Pluck › Check for Updates… checks at any time.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }

@@ -62,5 +62,11 @@ image inside it for copying, dragging out, or exporting as WebP.
 ## R7 Packaging
 - R7.1 Ships as a `.app` bundle with its own name and icon.
 - R7.2 Automated tests cover the major workflows (open, page filter,
-  de-duplication, transparency, edit, copy, export). An 80% coverage bar is
-  explicitly not required for this project.
+  de-duplication, transparency, edit, copy, export), with at least 80% line and
+  region coverage of PluckKit.
+- R7.3 When it opens, the app asks GitHub whether a newer version has been
+  released, and says so only when there is one. A switch in Settings turns this
+  off.
+- R7.4 Pluck › Check for Updates… checks at any time and always reports the
+  result. A newer version is downloaded to the Downloads folder only when the
+  user agrees.

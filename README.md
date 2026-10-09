@@ -47,6 +47,8 @@ It is free, and it works with any PDF you open; it contains no content of its ow
 - **Get them out:** ⌘C copies (PNG and TIFF), dragging to Finder drops `.webp` files, and ⌘E or ⇧⌘E exports
   the selection or everything shown as WebP.
 - **Settings** (⌘,): WebP quality, or lossless.
+- **Updates:** Pluck tells you when a new version is released, if you like: it checks when it opens (turn that
+  off in Settings) and on Pluck › Check for Updates….
 
 ## Requirements
 

@@ -13,7 +13,10 @@ struct PluckApp: App {
                 .frame(minWidth: 720, minHeight: 440)
         }
         .defaultSize(width: 1180, height: 760)
-        .commands { PluckCommands(router: appDelegate.router, recents: appDelegate.recents) }
+        .commands {
+            UpdateCommands(updater: .shared)
+            PluckCommands(router: appDelegate.router, recents: appDelegate.recents)
+        }
 
         Settings { SettingsView() }
     }
@@ -28,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Lets the bare executable from `swift run` behave like the bundled app.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        Task { await UpdateAlerts.checkAtLaunch(.shared) }
     }
 
     /// Finder's "Open With", the Dock's recent items and files dropped on the Dock icon arrive here.
