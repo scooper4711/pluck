@@ -65,8 +65,12 @@ rule or in mid-sentence. The continuation then runs to the first blank line.
 `StatBlock`, its entries and `TextRun` are `Codable`. `StatBlockExport` writes
 `{ "format": 1, "blocks": [StatBlock] }` as JSON under the exported type
 `io.github.scooper4711.pluck.statblock` (declared in `Info.plist`, conforming
-to `public.json`), alongside `StatBlockWriter`'s plain text. The same pair is
-offered by an `NSItemProvider` for drags. Each run keeps its bold and italic
+to `public.json`), alongside HTML and `StatBlockWriter`'s plain text. The same
+three are offered by an `NSItemProvider` for drags. The HTML is
+`StatBlockWriter.pastedHTML`, not the preview's `div.statblock`: rich-text apps
+drop CSS classes, so it has a heading, the traits on one line and a paragraph
+per entry with its label in bold. It starts with `<meta charset="utf-8">`,
+since AppKit otherwise reads pasted HTML as Latin-1 and garbles the glyphs. Each run keeps its bold and italic
 flags, and action glyphs stay as tokens such as `[two-actions]`, so the
 receiving app can rebuild the rules text. `PluckModel.visibleStatBlocks`
 collects the blocks of the shown pages, including those inside boxes, and

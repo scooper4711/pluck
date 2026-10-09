@@ -38,7 +38,8 @@ It is free, and it works with any PDF you open; it contains no content of its ow
   HTML.
 - **Stat blocks for other apps:** the stat blocks on the shown pages are listed above the text: click one to
   copy it, drag it out, or Copy All Stat Blocks (⌥⌘C). Apps that read Pluck's stat block format get the
-  structured block; every other app gets plain text.
+  structured block; rich-text apps such as Pages and Mail get it with bold labels, and every other app
+  gets plain text.
 - **Several PDFs at once:** each in its own window, with File › Open Recent.
 - **See it in context:** right-click an image and choose Show Page in Sidebar to scroll the navigator to the
   page it is on, without changing which pages are selected.

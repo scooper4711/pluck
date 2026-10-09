@@ -49,7 +49,8 @@ that plain copy-and-paste from Preview or Acrobat loses.
 - R4.7 The stat blocks on the shown pages are listed above the text. Clicking
   one copies it; it can also be dragged into another app, and Copy All Stat
   Blocks (⌥⌘C) copies every one. Each copy carries the structured block for
-  apps such as Combat Pad, plus its plain text for every other app.
+  apps such as Combat Pad, HTML with bold labels for rich-text apps such as
+  Pages and Mail, and plain text for every other app.
 
 ## R3 Output
 - R3.1 Three formats: plain text, Markdown, HTML.
