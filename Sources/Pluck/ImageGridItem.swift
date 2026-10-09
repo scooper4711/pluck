@@ -3,9 +3,11 @@ import PluckKit
 
 /// The grid's collection view: adds ⌘C and makes a right-click act on the item under the pointer.
 final class ImageCollectionView: NSCollectionView, NSMenuItemValidation {
-    var onCopy: () -> Void = {}
+    var onCopy: () -> Void = {
+        // Nothing to copy until the grid connects it to the model.
+    }
 
-    @objc func copy(_ sender: Any?) {
+    @objc func copy(_: Any?) {
         onCopy()
     }
 
@@ -88,7 +90,7 @@ private final class SelectionBackgroundView: NSView {
         didSet { needsDisplay = true }
     }
 
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_: NSRect) {
         guard isSelected else { return }
         let outline = NSBezierPath(roundedRect: bounds.insetBy(dx: 1.5, dy: 1.5), xRadius: 8, yRadius: 8)
         NSColor.controlAccentColor.withAlphaComponent(0.18).setFill()
@@ -107,7 +109,7 @@ private final class ThumbnailView: NSView {
         didSet { needsDisplay = true }
     }
 
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_: NSRect) {
         guard let image, let context = NSGraphicsContext.current?.cgContext else { return }
         let frame = fittedFrame(for: image)
         drawCheckerboard(in: frame, context: context)

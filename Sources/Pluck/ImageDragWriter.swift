@@ -37,20 +37,20 @@ final class ImageDragWriter: NSObject, NSFilePromiseProviderDelegate, NSPasteboa
     // MARK: - NSPasteboardItemDataProvider
 
     func pasteboard(
-        _ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType
+        _: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType
     ) {
         guard type == .png, let dragged = draggedImage(for: item),
               let png = try? PNGEncoder.encode(dragged.item.request.render()) else { return }
         item.setData(png, forType: .png)
     }
 
-    func pasteboardFinishedWithDataProvider(_ pasteboard: NSPasteboard) {
+    func pasteboardFinishedWithDataProvider(_: NSPasteboard) {
         draggedImages = [:]
     }
 
     // MARK: - NSFilePromiseProviderDelegate
 
-    func filePromiseProvider(_ provider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
+    func filePromiseProvider(_ provider: NSFilePromiseProvider, fileNameForType _: String) -> String {
         (provider.userInfo as? DraggedImage)?.item.fileName ?? "image.\(ImageExporter.fileExtension)"
     }
 
@@ -63,7 +63,7 @@ final class ImageDragWriter: NSObject, NSFilePromiseProviderDelegate, NSPasteboa
         completionHandler(Result { try dragged.exporter.write(dragged.item, to: url) }.failure)
     }
 
-    func operationQueue(for provider: NSFilePromiseProvider) -> OperationQueue {
+    func operationQueue(for _: NSFilePromiseProvider) -> OperationQueue {
         queue
     }
 

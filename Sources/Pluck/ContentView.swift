@@ -88,7 +88,9 @@ struct ContentView: View {
     private var isAskingForPassword: Binding<Bool> {
         Binding {
             if case .passwordRequired = model.phase { true } else { false }
-        } set: { _ in }
+        } set: { _ in
+            // The sheet closes by answering it, which moves the model on from asking.
+        }
     }
 
     private func submitPassword() {

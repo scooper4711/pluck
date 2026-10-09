@@ -59,7 +59,7 @@ public final class PDFImageSource: @unchecked Sendable {
             var outcome: Result<RasterImage, Error>?
             scan(locator.pageIndex) { occurrence in
                 if occurrenceIndex == locator.occurrenceIndex {
-                    outcome = Result { try Self.decode(occurrence) }
+                    outcome = Self.decodeResult(of: occurrence)
                 }
                 occurrenceIndex += 1
             }
@@ -91,6 +91,14 @@ public final class PDFImageSource: @unchecked Sendable {
         } catch {
             logger.info("Skipped an image on page \(locator.pageIndex + 1): \(error.localizedDescription)")
             return nil
+        }
+    }
+
+    private static func decodeResult(of occurrence: PDFImageOccurrence) -> Result<RasterImage, Error> {
+        do {
+            return .success(try decode(occurrence))
+        } catch {
+            return .failure(error)
         }
     }
 

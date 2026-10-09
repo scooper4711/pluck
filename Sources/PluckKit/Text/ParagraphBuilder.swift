@@ -157,7 +157,11 @@ struct ParagraphBuilder {
         let text = line.text
         let ratio = style.size / body.size
         if ratio >= 1.15, text.count <= 150 {
-            return ratio >= 2.2 ? 1 : ratio >= 1.6 ? 2 : 3
+            switch ratio {
+            case 2.2...: return 1
+            case 1.6...: return 2
+            default: return 3
+            }
         }
         let isAllBold = line.characters.allSatisfy { $0.style.isBold || $0.text == " " }
         let isDisplayLine = isAllBold && style.family != body.family && ratio >= 0.95 && text.count <= 80

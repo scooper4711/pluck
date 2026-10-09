@@ -24,18 +24,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let router = DocumentRouter()
     let recents = RecentDocuments(store: SystemRecentDocuments())
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         // Lets the bare executable from `swift run` behave like the bundled app.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
     }
 
     /// Finder's "Open With", the Dock's recent items and files dropped on the Dock icon arrive here.
-    func application(_ application: NSApplication, open urls: [URL]) {
+    func application(_: NSApplication, open urls: [URL]) {
         router.open(urls)
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true
     }
 }
