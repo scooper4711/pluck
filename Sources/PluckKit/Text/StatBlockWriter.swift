@@ -21,6 +21,25 @@ enum StatBlockWriter {
             let items = block.traits.map { "<li>\(escape(traitName($0)))</li>" }
             lines += ["<ul class=\"traits\">"] + items + ["</ul>"]
         }
+        lines += entryLines(block, inline: inline)
+        lines.append("</div>")
+        return lines.joined(separator: "\n")
+    }
+
+    /// A stat block for rich-text apps such as Pages and Mail, which ignore the preview's styles:
+    /// a heading, the traits on one line, and a paragraph per entry with its label in bold.
+    static func pastedHTML(_ block: StatBlock, inline: ([TextRun]) -> String) -> String {
+        var lines = ["<h3>\(escape(block.displayName)) — \(escape(block.level))</h3>"]
+        if !block.traits.isEmpty {
+            lines.append("<p>\(escape(block.traits.map(traitName).joined(separator: ", ")))</p>")
+        }
+        lines += entryLines(block, inline: inline)
+        return lines.joined(separator: "\n")
+    }
+
+    /// A paragraph per entry, with its label in bold and a rule between the block's sections.
+    private static func entryLines(_ block: StatBlock, inline: ([TextRun]) -> String) -> [String] {
+        var lines: [String] = []
         for (index, section) in block.sections.filter({ !$0.isEmpty }).enumerated() {
             if index > 0 { lines.append("<hr>") }
             lines += section.map { entry in
@@ -28,8 +47,7 @@ enum StatBlockWriter {
                 return "<p>\(label)\(inline(entry.runs))</p>"
             }
         }
-        lines.append("</div>")
-        return lines.joined(separator: "\n")
+        return lines
     }
 
     /// Traits are printed in capitals; alignments stay that way (`LE`), the rest become words.
