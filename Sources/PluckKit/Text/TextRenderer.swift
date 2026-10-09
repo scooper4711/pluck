@@ -139,11 +139,20 @@ private struct MarkdownWriter {
 
     private func inline(_ runs: [TextRun]) -> String {
         runs.map { run in
-            let marker = run.isBold && run.isItalic ? "***" : run.isBold ? "**" : run.isItalic ? "*" : ""
+            let marker = Self.emphasisMarker(of: run)
             let parts = EmphasisParts(of: run)
             guard !marker.isEmpty, !parts.core.isEmpty else { return escape(run.text) }
             return parts.leading + marker + escape(parts.core) + marker + parts.trailing
         }.joined()
+    }
+
+    private static func emphasisMarker(of run: TextRun) -> String {
+        switch (run.isBold, run.isItalic) {
+        case (true, true): "***"
+        case (true, false): "**"
+        case (false, true): "*"
+        case (false, false): ""
+        }
     }
 
     /// Escapes Markdown's own characters; action glyphs become the `pf2:` codes that the

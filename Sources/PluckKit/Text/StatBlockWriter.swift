@@ -181,13 +181,22 @@ struct StatBlockYAMLWriter {
     private func inline(_ runs: [TextRun]) -> String {
         let text = runs.map { run -> String in
             let core = run.text.trimmingCharacters(in: .whitespaces)
-            let marker = run.isBold && run.isItalic ? "___" : run.isBold ? "__" : run.isItalic ? "_" : ""
+            let marker = Self.emphasisMarker(of: run)
             guard !marker.isEmpty, !core.isEmpty else { return run.text }
             let leading = run.text.prefix { $0 == " " }
             let trailing = run.text.hasSuffix(" ") ? " " : ""
             return leading + marker + core + marker + trailing
         }.joined()
         return ActionGlyph.replacing(in: text, with: \.statblockCode).trimmingCharacters(in: .whitespaces)
+    }
+
+    private static func emphasisMarker(of run: TextRun) -> String {
+        switch (run.isBold, run.isItalic) {
+        case (true, true): "___"
+        case (true, false): "__"
+        case (false, true): "_"
+        case (false, false): ""
+        }
     }
 
     private func quoted(_ text: String) -> String {

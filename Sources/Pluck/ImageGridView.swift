@@ -33,7 +33,7 @@ struct ImageGridView: NSViewRepresentable {
         return scrollView
     }
 
-    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+    func updateNSView(_: NSScrollView, context: Context) {
         context.coordinator.onSelectionChange = { selection = $0 }
         context.coordinator.show(ImageGridContent(
             images: images, transforms: transforms, selection: selection, thumbnailSize: thumbnailSize))
@@ -42,7 +42,9 @@ struct ImageGridView: NSViewRepresentable {
 
 @MainActor
 final class ImageGridCoordinator: NSObject, NSCollectionViewDelegate {
-    var onSelectionChange: (Set<String>) -> Void = { _ in }
+    var onSelectionChange: (Set<String>) -> Void = { _ in
+        // Nobody listens until the grid connects it to the model.
+    }
 
     private let actions: AppActions
     private let layout = NSCollectionViewFlowLayout()
@@ -91,16 +93,16 @@ final class ImageGridCoordinator: NSObject, NSCollectionViewDelegate {
 
     // MARK: - NSCollectionViewDelegate
 
-    func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
+    func collectionView(_: NSCollectionView, didSelectItemsAt _: Set<IndexPath>) {
         reportSelection()
     }
 
-    func collectionView(_ collectionView: NSCollectionView, didDeselectItemsAt indexPaths: Set<IndexPath>) {
+    func collectionView(_: NSCollectionView, didDeselectItemsAt _: Set<IndexPath>) {
         reportSelection()
     }
 
     func collectionView(
-        _ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath
+        _: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath
     ) -> NSPasteboardWriting? {
         guard let id = dataSource?.itemIdentifier(for: indexPath),
               let item = actions.model.exportItem(forImageID: id) else { return nil }
@@ -108,8 +110,8 @@ final class ImageGridCoordinator: NSObject, NSCollectionViewDelegate {
     }
 
     func collectionView(
-        _ collectionView: NSCollectionView, draggingSession session: NSDraggingSession,
-        willBeginAt screenPoint: NSPoint, forItemsAt indexPaths: Set<IndexPath>
+        _: NSCollectionView, draggingSession session: NSDraggingSession,
+        willBeginAt _: NSPoint, forItemsAt _: Set<IndexPath>
     ) {
         dragWriter.offerImageData(on: session.draggingPasteboard)
     }

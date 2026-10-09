@@ -6,7 +6,7 @@ import SwiftUI
 struct TextOutputView: NSViewRepresentable {
     let text: String
 
-    func makeNSView(context: Context) -> NSScrollView {
+    func makeNSView(context _: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
         guard let textView = scrollView.documentView as? NSTextView else { return scrollView }
         textView.isEditable = false
@@ -22,7 +22,7 @@ struct TextOutputView: NSViewRepresentable {
         return scrollView
     }
 
-    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+    func updateNSView(_ scrollView: NSScrollView, context _: Context) {
         guard let textView = scrollView.documentView as? NSTextView, textView.string != text else { return }
         textView.string = text
     }

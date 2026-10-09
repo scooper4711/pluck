@@ -14,16 +14,17 @@ struct HTMLPreviewView: NSViewRepresentable {
     func makeNSView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         webView.allowsMagnification = true
+        webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
         return webView
     }
 
-    func updateNSView(_ webView: WKWebView, context: Context) {
+    func updateNSView(_: WKWebView, context: Context) {
         context.coordinator.show(markup)
     }
 
     @MainActor
-    final class Coordinator {
+    final class Coordinator: NSObject, WKNavigationDelegate {
         /// Pages arrive one at a time while a document is read; reloading for each would flicker.
         private static let settleDelay: Duration = .milliseconds(120)
 
@@ -40,6 +41,11 @@ struct HTMLPreviewView: NSViewRepresentable {
                 guard !Task.isCancelled else { return }
                 self?.webView?.loadHTMLString(HTMLPreviewPage.document(around: markup), baseURL: nil)
             }
+        }
+
+        /// The preview shows only the page it was given: text from a PDF never takes it anywhere else.
+        func webView(_: WKWebView, decidePolicyFor action: WKNavigationAction) async -> WKNavigationActionPolicy {
+            action.navigationType == .other && action.targetFrame?.isMainFrame == true ? .allow : .cancel
         }
     }
 }
