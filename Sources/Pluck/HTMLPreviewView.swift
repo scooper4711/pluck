@@ -43,9 +43,14 @@ struct HTMLPreviewView: NSViewRepresentable {
             }
         }
 
-        /// The preview shows only the page it was given: text from a PDF never takes it anywhere else.
-        func webView(_: WKWebView, decidePolicyFor action: WKNavigationAction) async -> WKNavigationActionPolicy {
-            action.navigationType == .other && action.targetFrame?.isMainFrame == true ? .allow : .cancel
+        /// The preview shows only the page it was given, which loads as `about:blank`: links in text from a
+        /// PDF never take it anywhere else.
+        func webView(
+            _: WKWebView, decidePolicyFor action: WKNavigationAction,
+            decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void
+        ) {
+            let isPreviewPage = action.request.url?.absoluteString == "about:blank"
+            decisionHandler(isPreviewPage && action.targetFrame?.isMainFrame == true ? .allow : .cancel)
         }
     }
 }
