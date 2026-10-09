@@ -178,7 +178,7 @@ private struct MarkdownWriter {
     }
 }
 
-private enum HTMLWriter {
+enum HTMLWriter {
     static func render(_ blocks: [TextBlock]) -> String {
         var output: [String] = []
         var listItems: [String] = []
@@ -214,7 +214,7 @@ private enum HTMLWriter {
         }
     }
 
-    private static func inline(_ runs: [TextRun]) -> String {
+    static func inline(_ runs: [TextRun]) -> String {
         runs.map { run in
             let parts = EmphasisParts(of: run)
             guard !parts.core.isEmpty else { return escape(run.text) }
