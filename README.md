@@ -68,6 +68,18 @@ The app is not notarized by Apple, so macOS blocks it the first time:
 
 After that it opens normally.
 
+## Society Toolkit
+
+Pluck is part of the Society Toolkit, free Mac apps for Pathfinder and Starfinder players and GMs. Like
+the toolkits in the game, each one grants a +1 item bonus to game prep.
+
+- [Scrollkeeper](https://github.com/scooper4711/scrollkeeper) keeps your Paizo library in order and
+  downloads your purchases.
+- **Pluck** gets the art, text and stat blocks out of a PDF.
+- [Pawn Shop](https://github.com/scooper4711/pawn-shop) prints just the pawns you need, single-sided, from
+  your pawn PDFs.
+- [Mapsmith](https://github.com/scooper4711/mapsmith) prints battle maps at true scale on ordinary paper.
+
 ## Supporting the project
 
 The app is free and always will be. If it saves you time and you would like to say thanks, you can leave a
