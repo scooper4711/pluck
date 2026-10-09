@@ -87,6 +87,17 @@ the system list updates late.
 `NSCollectionView` grid. The grid is AppKit because it provides rubber-band
 selection and multi-item drag with file promises.
 
+## Updates
+
+`PluckKit/Updates`: `AppUpdater` asks GitHub's `releases/latest` for the
+repository, compares the tag with the bundle version (`AppVersion`, number by
+number) and offers the release's `.dmg`. A 404, which GitHub answers before the
+first release, counts as up to date. Builds without a version (0.0.0) skip the
+launch check, which would otherwise always find an update. The app shows results
+in app-modal alerts (`UpdateAlerts`), so they appear once however many windows
+are open; the launch check follows the user default `checksForUpdatesAtLaunch`,
+on unless turned off in Settings.
+
 ## Known limits
 
 - Separation/DeviceN color spaces are approximated (tint functions are not
