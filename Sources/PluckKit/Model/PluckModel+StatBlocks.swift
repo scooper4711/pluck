@@ -1,6 +1,6 @@
 import AppKit
 
-/// The stat blocks on the shown pages, for copying into other apps such as Combat Pad.
+/// The stat blocks on the shown pages, for copying into other apps such as Turnkeeper.
 extension PluckModel {
     /// The stat blocks on the shown pages, in reading order, including any set in boxes.
     public var visibleStatBlocks: [StatBlock] {
@@ -17,7 +17,7 @@ extension PluckModel {
         }
     }
 
-    /// Puts stat blocks on the pasteboard for apps such as Combat Pad, and as plain text for the rest.
+    /// Puts stat blocks on the pasteboard for apps such as Turnkeeper, and as plain text for the rest.
     public func copyStatBlocks(_ blocks: [StatBlock], to pasteboard: NSPasteboard = .general) {
         do {
             try StatBlockExport.write(blocks, to: pasteboard)

@@ -2,7 +2,7 @@ import PluckKit
 import SwiftUI
 
 /// The stat blocks on the shown pages, above the text: click one to copy it, drag it into another app such
-/// as Combat Pad, or copy them all.
+/// as Turnkeeper, or copy them all.
 struct StatBlockStrip: View {
     let model: PluckModel
 
@@ -41,7 +41,7 @@ struct StatBlockStrip: View {
         }
         .buttonStyle(.plain)
         .onDrag { StatBlockExport.itemProvider(for: [block]) }
-        .help("Click to copy, or drag into Combat Pad")
+        .help("Click to copy, or drag into Turnkeeper")
         .contextMenu {
             Button("Copy Stat Block") { model.copyStatBlocks([block]) }
         }
