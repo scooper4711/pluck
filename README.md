@@ -17,8 +17,16 @@ cutting it off.
 Pluck is a Mac app that opens a PDF and offers up every image inside it, and its text too. It reads the images
 the PDF actually contains, at their own resolution and with their transparency, so a creature's art comes out
 as the creature alone, ready for a token, a custom pawn in [Pawn Shop](https://github.com/scooper4711/pawn-shop)
-or a virtual tabletop. It also reads the text in reading order, and turns Pathfinder stat blocks into data
-other apps can use.
+or a virtual tabletop.
+
+Stat blocks have the same problem. Copy one out of a PDF into your notes and you spend the next few minutes
+fixing it: lines broken wherever the PDF's column ended, text from the next column mixed in, the bold labels
+gone, and the action icons turned into stray characters. Pluck reads the text in reading order and recognizes
+Pathfinder stat blocks on the page, so a creature comes out whole and already formatted. Click one to copy it,
+or drag it out: rich-text apps such as Pages and Mail get it with its bold labels and action icons, every
+other app gets clean plain text, and apps that read Pluck's stat block format, such as an encounter tracker,
+get the creature as data. Switch the text to Markdown and stat blocks come out as
+[Fantasy Statblocks](https://github.com/javalent/fantasy-statblocks) YAML, ready for Obsidian.
 
 It is free and open source, and it works with any PDF you open; it contains no content of its own.
 
