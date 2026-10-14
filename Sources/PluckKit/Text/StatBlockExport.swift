@@ -1,7 +1,7 @@
 import AppKit
 import UniformTypeIdentifiers
 
-/// Stat blocks on the pasteboard and in drags, for apps such as Combat Pad that turn them into creatures.
+/// Stat blocks on the pasteboard and in drags, for apps such as Turnkeeper that turn them into creatures.
 ///
 /// The data is JSON, `{ "format": 1, "blocks": [StatBlock] }`, under the type
 /// `io.github.scooper4711.pluck.statblock`. Each block keeps its name, level, traits, entries (bold label
