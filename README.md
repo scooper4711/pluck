@@ -10,16 +10,17 @@
 
 <img src="Resources/AppIcon.png" width="128" alt="Pluck icon">
 
-A Mac app that opens a PDF and offers up every image inside it, and its text too.
+Have you wanted a creature's art from an adventure PDF, for a token or a custom pawn? Getting a picture out of
+a PDF usually means a screenshot: the wrong size, a background where it should be transparent, and a page edge
+cutting it off.
 
-Getting a picture out of a PDF usually means a screenshot: the wrong size, a background where it should be
-transparent, and a page edge cutting it off. Pluck reads the images the PDF actually contains, at their own
-resolution and with their transparency, so a creature's art from an adventure comes out as the creature
-alone, ready for a token, a custom pawn in [Pawn Shop](https://github.com/scooper4711/pawn-shop) or a
-virtual tabletop. It also reads the text in reading order, and turns Pathfinder stat blocks into data other
-apps can use.
+Pluck is a Mac app that opens a PDF and offers up every image inside it, and its text too. It reads the images
+the PDF actually contains, at their own resolution and with their transparency, so a creature's art comes out
+as the creature alone, ready for a token, a custom pawn in [Pawn Shop](https://github.com/scooper4711/pawn-shop)
+or a virtual tabletop. It also reads the text in reading order, and turns Pathfinder stat blocks into data
+other apps can use.
 
-It is free, and it works with any PDF you open; it contains no content of its own.
+It is free and open source, and it works with any PDF you open; it contains no content of its own.
 
 ![The Pluck window: page thumbnails on the left and the seven illustrations from a three-page PDF in a grid, each with its size and page](docs/images/screenshot.png)
 
