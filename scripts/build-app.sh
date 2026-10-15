@@ -25,6 +25,8 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BINARY" "$APP/Contents/MacOS/$EXECUTABLE"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+# The About panel shows this file: the notices of the libraries built into the app.
+cp Resources/Credits.html "$APP/Contents/Resources/Credits.html"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" \
     "$APP/Contents/Info.plist"
 # Ad-hoc signature: enough to run locally; Gatekeeper still asks on other Macs.
