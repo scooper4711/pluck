@@ -1,10 +1,12 @@
 name: Release
 
-# Builds the app when a version tag is pushed and attaches a disk image to the
-# GitHub release for that tag, creating a draft release if none exists yet.
+# Builds the app and attaches a disk image to the GitHub release for a version tag, creating a draft release if
+# none exists yet. Run by hand, it builds the branch and keeps the disk image as a workflow artifact instead, to
+# try the build without releasing.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,10 +18,13 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ github.ref_name }}
+      # False for a trial build of a branch, run by hand.
+      RELEASING: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/checkout@v7
 
       - name: Derive the version from the tag
+        if: env.RELEASING == 'true'
         run: echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
 
       - name: Test
@@ -31,12 +36,20 @@ jobs:
       - name: Make the disk image
         run: scripts/make-dmg.sh
 
+      - name: Keep the disk image of a trial build
+        if: env.RELEASING != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: disk-image
+          path: build/Pluck-*.dmg
+
       - name: Attach the disk image to the release
+        if: env.RELEASING == 'true'
         run: |
-          # The release is normally created right after the tag is pushed; give it a moment.
-          for attempt in 1 2 3 4 5 6; do
+          # A release made for a pushed tag normally appears right after the push; give it a moment.
+          for _ in 1 2 3 4 5 6; do
             gh release view "$TAG" >/dev/null 2>&1 && break
             sleep 10
           done
           gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --draft --title "$TAG" --generate-notes
-          gh release upload "$TAG" "dist/Pluck-$VERSION.dmg" --clobber
+          gh release upload "$TAG" "build/Pluck-$VERSION.dmg" --clobber
