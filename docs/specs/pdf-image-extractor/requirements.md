@@ -70,3 +70,5 @@ image inside it for copying, dragging out, or exporting as WebP.
 - R7.4 Pluck › Check for Updates… checks at any time and always reports the
   result. A newer version is downloaded to the Downloads folder only when the
   user agrees.
+- R7.5 Pluck › About Pluck credits the libraries built into the app with their
+  licenses: libwebp's copyright notice and BSD license in full.
