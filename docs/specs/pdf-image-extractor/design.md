@@ -10,7 +10,7 @@ A Swift package with three targets:
 | `Pluck` | Thin SwiftUI/AppKit shell: split view, page sidebar, image grid, menus, panels. |
 | `PluckKitTests` | Swift Testing suite driving `PluckKit` against PDFs it writes by hand. |
 
-`scripts/build-app.sh` builds the release binary and assembles `dist/Pluck.app`.
+`scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`.
 
 ## Extraction pipeline
 

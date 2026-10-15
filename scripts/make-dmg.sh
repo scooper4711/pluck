@@ -1,13 +1,13 @@
 #!/bin/sh
-# Packages the built app into dist/Pluck-<VERSION>.dmg.
+# Packages the built app into build/Pluck-<VERSION>.dmg.
 set -eu
 
 cd "$(dirname "$0")/.."
 
 VERSION="${VERSION:-0.0.0}"
-APP="dist/Pluck.app"
-STAGING="dist/dmg"
-DMG="dist/Pluck-$VERSION.dmg"
+APP="build/Pluck.app"
+STAGING="build/dmg"
+DMG="build/Pluck-$VERSION.dmg"
 
 [ -d "$APP" ] || { echo "Making the disk image failed: $APP has not been built." >&2; exit 1; }
 
