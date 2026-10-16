@@ -17,7 +17,7 @@ app:
 	scripts/build-app.sh
 
 run: app
-	open dist/Pluck.app
+	open build/Pluck.app
 
 # Builds the app and moves it to /Applications, replacing an earlier copy.
 install:
@@ -31,4 +31,4 @@ icon:
 	scripts/make-icon.sh
 
 clean:
-	rm -rf .build dist coverage
+	rm -rf .build build coverage

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds dist/Pluck.app from the Swift package (release configuration, ad-hoc signed).
+# Builds build/Pluck.app from the Swift package (release configuration, ad-hoc signed).
 #
 # Usage: scripts/build-app.sh [--install]   (--install moves it to /Applications)
 #
@@ -9,12 +9,14 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 VERSION="${VERSION:-0.0.0}"
-APP="dist/Pluck.app"
+APP="build/Pluck.app"
 EXECUTABLE="Pluck"
 
 if [[ "${UNIVERSAL:-0}" == "1" ]]; then
     swift build -c release --product "$EXECUTABLE" --arch arm64 --arch x86_64
-    BINARY=".build/apple/Products/Release/$EXECUTABLE"
+    # Asked rather than assumed: newer SwiftPM moved universal builds out of .build/apple, and a copy left
+    # there by an older toolchain would otherwise be bundled instead.
+    BINARY="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/$EXECUTABLE"
 else
     swift build -c release --product "$EXECUTABLE"
     BINARY="$(swift build -c release --show-bin-path)/$EXECUTABLE"

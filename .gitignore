@@ -1,6 +1,6 @@
 .build/
 .swiftpm/
-dist/
+build/
 tmp/
 *.xcodeproj
 xcuserdata/

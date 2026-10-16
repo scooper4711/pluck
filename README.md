@@ -107,7 +107,7 @@ tip on [Ko-fi](https://ko-fi.com/coop207627). A donation is entirely optional an
 ## Building
 
 ```sh
-make app      # builds dist/Pluck.app
+make app      # builds build/Pluck.app
 make run      # builds and launches the app
 make install  # builds the app and moves it to /Applications
 make test     # runs the unit tests
