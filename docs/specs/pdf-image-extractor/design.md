@@ -10,7 +10,11 @@ A Swift package with three targets:
 | `Pluck` | Thin SwiftUI/AppKit shell: split view, page sidebar, image grid, menus, panels. |
 | `PluckKitTests` | Swift Testing suite driving `PluckKit` against PDFs it writes by hand. |
 
-`scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`.
+`scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`, signed ad hoc with
+`Resources/Pluck.entitlements` (R7.6): the App Sandbox, network client (GitHub's update check, and WebKit,
+whose web content process won't start without it), read-write access to files the user picks, and the
+Downloads folder for updates. `Resources/container-migration.plist` goes into the bundle; on the first
+sandboxed launch macOS moves the preferences into the container.
 
 ## Extraction pipeline
 

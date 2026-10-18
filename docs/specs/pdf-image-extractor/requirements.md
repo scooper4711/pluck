@@ -72,3 +72,7 @@ image inside it for copying, dragging out, or exporting as WebP.
   user agrees.
 - R7.5 Pluck › About Pluck credits the libraries built into the app with their
   licenses: libwebp's copyright notice and BSD license in full.
+- R7.6 The app runs in the App Sandbox, without a paid Apple developer account.
+  It reads and writes only the files and folders the user opens, drops, saves
+  to or exports into, plus the Downloads folder for updates. Its first
+  sandboxed launch moves the settings an earlier version kept into the sandbox.
