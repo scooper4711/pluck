@@ -18,6 +18,11 @@ struct PluckApp: App {
             PluckCommands(router: appDelegate.router, recents: appDelegate.recents)
         }
 
+        Window("Open from Scrollkeeper", id: ScrollkeeperWindow.id) {
+            ScrollkeeperWindow(bridge: appDelegate.scrollkeeper)
+        }
+        .windowResizability(.contentSize)
+
         Settings { SettingsView() }
     }
 }
@@ -26,6 +31,7 @@ struct PluckApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let router = DocumentRouter()
     let recents = RecentDocuments(store: SystemRecentDocuments())
+    let scrollkeeper = ScrollkeeperBridge(launcher: WorkspaceLauncher())
 
     func applicationDidFinishLaunching(_: Notification) {
         // Lets the bare executable from `swift run` behave like the bundled app.
@@ -34,9 +40,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { await UpdateAlerts.checkAtLaunch(.shared) }
     }
 
-    /// Finder's "Open With", the Dock's recent items and files dropped on the Dock icon arrive here.
+    /// Finder's "Open With", the Dock's recent items, files dropped on the Dock icon, and the list, status
+    /// links and PDFs Scrollkeeper hands over arrive here.
     func application(_: NSApplication, open urls: [URL]) {
-        router.open(urls)
+        var documents: [URL] = []
+        for url in urls {
+            if ScrollkeeperBridge.isStatusLink(url) {
+                scrollkeeper.receiveStatus(url)
+            } else if ScrollkeeperIndex.isIndexFile(url) {
+                scrollkeeper.receive(url)
+            } else {
+                documents.append(url)
+            }
+        }
+        router.open(documents)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
