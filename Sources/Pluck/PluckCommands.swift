@@ -6,11 +6,14 @@ struct PluckCommands: Commands {
     @ObservedObject var recents: RecentDocuments
     /// The frontmost document window's commands; `nil` when no document window has focus.
     @FocusedValue(\.documentActions) private var actions
+    @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
             Button("Open…") { router.open(DocumentPanel.choosePDFs()) }
                 .keyboardShortcut("o")
+            Button("Open from Scrollkeeper…") { openWindow(id: ScrollkeeperWindow.id) }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
             Menu("Open Recent") {
                 ForEach(recents.urls, id: \.self) { url in
                     Button(url.lastPathComponent) { router.open([url]) }

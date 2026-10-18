@@ -102,6 +102,32 @@ in app-modal alerts (`UpdateAlerts`), so they appear once however many windows
 are open; the launch check follows the user default `checksForUpdatesAtLaunch`,
 on unless turned off in Settings.
 
+## Preview
+
+`ImageCollectionView.keyDown` hands Space to the window, which renders the
+selection with `PluckModel.previewSelection()` (the same `RenderRequest` as Copy)
+to PNGs in a new temporary folder and shows them with SwiftUI's
+`quickLookPreview`.
+
+## Open from Scrollkeeper
+
+`ScrollkeeperBridge` (PluckKit) holds the window's state. `requestIndex()` opens
+`scrollkeeper://index?app=pluck` in the background through `ApplicationLauncher`
+(the app's `WorkspaceLauncher` wraps `NSWorkspace`; tests use a fake).
+Scrollkeeper writes the list and opens it with Pluck; `AppDelegate` passes files
+with the `scrollkeeperindex` extension to `receive(_:)` and the rest to the
+document router. `Info.plist` imports the file's type,
+`io.github.scooper4711.scrollkeeper.index`, and lists it as a document type, so
+Launch Services can open it with Pluck. `ScrollkeeperIndex` mirrors the format
+Scrollkeeper defines in its `docs/specs/app-handoff/design.md` and refuses a
+newer format version. `open(_:)` asks in the background and records a
+`ScrollkeeperRequest`; `Info.plist` registers the `pluck` URL scheme, and the
+status links (`isStatusLink`) go to `receiveStatus(_:)`, which moves the request
+through requested, downloading, opening or failed, or marks a failed list
+request (empty SKU). `ScrollkeeperWindow` is a separate `Window` scene.
+Mapsmith has the same search; when a third app needs it, it moves into a shared
+package.
+
 ## Known limits
 
 - Separation/DeviceN color spaces are approximated (tint functions are not

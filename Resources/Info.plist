@@ -18,6 +18,49 @@
 				<string>com.adobe.pdf</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Scrollkeeper Library List</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>io.github.scooper4711.scrollkeeper.index</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>io.github.scooper4711.scrollkeeper.index</string>
+			<key>UTTypeDescription</key>
+			<string>Scrollkeeper Library List</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>scrollkeeperindex</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.github.scooper4711.pluck.handoff</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pluck</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>Pluck</string>

@@ -275,7 +275,7 @@ public final class PluckModel {
         return ExportItem(request: try renderRequest(for: image), baseName: "\(stem)-p\(page)-\(ordinal)")
     }
 
-    private func renderRequest(for image: ExtractedImage) throws -> RenderRequest {
+    func renderRequest(for image: ExtractedImage) throws -> RenderRequest {
         guard let source else { throw PluckError.noDocument(operation: "render an image") }
         return RenderRequest(source: source, locator: image.locator, transform: transform(for: image))
     }

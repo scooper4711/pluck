@@ -50,6 +50,10 @@ image inside it for copying, dragging out, or exporting as WebP.
 - R5.2 Selected images can be rotated left/right by 90° and flipped
   horizontally/vertically; edits compose and apply to copy, drag and export.
 
+- R5.4 Space previews the selected images in Quick Look, as in Finder,
+  rotated and flipped as shown, with arrows between them when several are
+  selected; Space or Escape closes it.
+
 ## R6 Output
 - R6.1 Copy puts the selected images on the pasteboard, alpha intact.
 - R6.2 Dragging images out to Finder creates WebP files; other apps receive
@@ -76,3 +80,23 @@ image inside it for copying, dragging out, or exporting as WebP.
   It reads and writes only the files and folders the user opens, drops, saves
   to or exports into, plus the Downloads folder for updates. Its first
   sandboxed launch moves the settings an earlier version kept into the sandbox.
+
+## R8 Open from Scrollkeeper
+- R8.1 File › Open from Scrollkeeper… (⇧⌘O) lists the titles the user owns in
+  Scrollkeeper that offer a PDF, and searches them by title, type and series
+  as the user types; the best match is selected, so Return opens it.
+- R8.2 The list comes from Scrollkeeper, which hands it to Pluck as a file
+  (`scrollkeeper://index?app=pluck`), so it works in the App Sandbox (R7.6).
+  Scrollkeeper starts in the background when it isn't running.
+- R8.3 Opening a title asks Scrollkeeper (`scrollkeeper://open?sku=…&app=pluck`),
+  which stays in the background, to download it when needed and open its PDFs
+  in Pluck. Titles not yet downloaded are marked, and the button then says
+  Download and Open.
+- R8.3a While Scrollkeeper downloads the title, Pluck's window stays open and
+  shows the progress on its row and in words, from the status links
+  Scrollkeeper sends (`pluck://handoff?…`). The window closes when the PDFs
+  are on their way; a failure shows Scrollkeeper's reason, in red.
+- R8.4 The window says when Scrollkeeper isn't installed (with a link to get
+  it), hasn't answered after 15 seconds (with buttons to open Scrollkeeper or
+  try again), couldn't send the list (with its reason, such as needing to sign
+  in), or handed over a list Pluck can't read or that is in a newer format.

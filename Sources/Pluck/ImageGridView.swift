@@ -18,6 +18,9 @@ struct ImageGridView: NSViewRepresentable {
     @Binding var selection: Set<String>
     let thumbnailSize: CGFloat
     let actions: AppActions
+    var onSpace: () -> Void = {
+        // No preview unless the window provides one.
+    }
 
     func makeCoordinator() -> ImageGridCoordinator {
         ImageGridCoordinator(actions: actions)
@@ -33,8 +36,9 @@ struct ImageGridView: NSViewRepresentable {
         return scrollView
     }
 
-    func updateNSView(_: NSScrollView, context: Context) {
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
         context.coordinator.onSelectionChange = { selection = $0 }
+        (scrollView.documentView as? ImageCollectionView)?.onSpace = onSpace
         context.coordinator.show(ImageGridContent(
             images: images, transforms: transforms, selection: selection, thumbnailSize: thumbnailSize))
     }

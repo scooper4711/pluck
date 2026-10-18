@@ -1,4 +1,5 @@
 import PluckKit
+import QuickLook
 import SwiftUI
 
 struct ContentView: View {
@@ -9,6 +10,9 @@ struct ContentView: View {
     /// Read here so that changing the setting redraws the text.
     @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
     @State private var password = ""
+    /// The selected images Quick Look shows, as temporary PNGs (Space, as in Finder).
+    @State private var previewFile: URL?
+    @State private var previewFiles: [URL] = []
 
     var body: some View {
         NavigationSplitView {
@@ -63,10 +67,23 @@ struct ContentView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
     }
 
+    private func togglePreview() {
+        guard previewFile == nil else {
+            previewFile = nil
+            return
+        }
+        Task {
+            guard let files = try? await model.previewSelection(), let first = files.first else { return }
+            previewFiles = files
+            previewFile = first
+        }
+    }
+
     private var imageGrid: some View {
         ImageGridView(
             images: model.visibleImages, transforms: model.transforms, selection: $model.selectedImageIDs,
-            thumbnailSize: thumbnailSize, actions: actions)
+            thumbnailSize: thumbnailSize, actions: actions, onSpace: togglePreview)
+            .quickLookPreview($previewFile, in: previewFiles)
             .overlay {
                 if model.phase == .ready, model.visibleImages.isEmpty {
                     ContentUnavailableView("No Images", systemImage: "photo",
