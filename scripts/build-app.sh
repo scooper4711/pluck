@@ -29,10 +29,13 @@ cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # The About panel shows this file: the notices of the libraries built into the app.
 cp Resources/Credits.html "$APP/Contents/Resources/Credits.html"
+# Moves the settings an unsandboxed version kept into the sandbox on the first sandboxed launch.
+cp Resources/container-migration.plist "$APP/Contents/Resources/container-migration.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" \
     "$APP/Contents/Info.plist"
-# Ad-hoc signature: enough to run locally; Gatekeeper still asks on other Macs.
-codesign --force --sign - "$APP"
+# Ad-hoc signature: enough to run locally; Gatekeeper still asks on other Macs. The entitlements turn on the
+# App Sandbox (R7.6).
+codesign --force --sign - --entitlements Resources/Pluck.entitlements "$APP"
 echo "Built $APP ($VERSION)"
 
 if [[ "${1:-}" == "--install" ]]; then
