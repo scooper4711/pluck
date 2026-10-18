@@ -101,6 +101,16 @@ struct PluckModelTests {
         #expect(model.selectedImages.isEmpty)
     }
 
+    @Test("Space previews the selection as PNGs, edited as shown")
+    func previewSelection() async throws {
+        try await openSample()
+        select(width: 2)
+        model.apply(.rotateRight)
+        let urls = try await model.previewSelection()
+        #expect(urls.count == model.selectedImages.count)
+        #expect(urls.allSatisfy { $0.pathExtension == "png" && FileManager.default.fileExists(atPath: $0.path) })
+    }
+
     @Test("Edits apply to the selection only and carry through to exported WebP")
     func editAndExport() async throws {
         try await openSample()

@@ -7,8 +7,21 @@ final class ImageCollectionView: NSCollectionView, NSMenuItemValidation {
         // Nothing to copy until the grid connects it to the model.
     }
 
+    /// Space previews the selection in Quick Look, as in Finder.
+    var onSpace: () -> Void = {
+        // Nothing to preview until the grid connects it to the window.
+    }
+
     @objc func copy(_: Any?) {
         onCopy()
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if event.charactersIgnoringModifiers == " " {
+            onSpace()
+        } else {
+            super.keyDown(with: event)
+        }
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
