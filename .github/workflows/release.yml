@@ -30,11 +30,25 @@ jobs:
       - name: Test
         run: scripts/coverage.sh
 
+      - name: Add the Developer ID certificate to a temporary keychain
+        env:
+          DEVELOPER_ID_CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+          DEVELOPER_ID_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+        run: scripts/add-signing-certificate.sh
+
       - name: Build the universal app
         run: UNIVERSAL=1 scripts/build-app.sh
 
       - name: Make the disk image
         run: scripts/make-dmg.sh
+
+      - name: Notarize the disk image
+        if: env.RELEASING == 'true'
+        env:
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: scripts/notarize.sh "build/Pluck-$VERSION.dmg"
 
       - name: Keep the disk image of a trial build
         if: env.RELEASING != 'true'

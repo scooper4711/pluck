@@ -33,9 +33,8 @@ cp Resources/Credits.html "$APP/Contents/Resources/Credits.html"
 cp Resources/container-migration.plist "$APP/Contents/Resources/container-migration.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" \
     "$APP/Contents/Info.plist"
-# Ad-hoc signature: enough to run locally; Gatekeeper still asks on other Macs. The entitlements turn on the
-# App Sandbox (R7.6).
-codesign --force --sign - --entitlements Resources/Pluck.entitlements "$APP"
+# The entitlements turn on the App Sandbox.
+scripts/sign-app.sh "$APP" Resources/Pluck.entitlements
 echo "Built $APP ($VERSION)"
 
 if [[ "${1:-}" == "--install" ]]; then

@@ -10,11 +10,19 @@ A Swift package with three targets:
 | `Pluck` | Thin SwiftUI/AppKit shell: split view, page sidebar, image grid, menus, panels. |
 | `PluckKitTests` | Swift Testing suite driving `PluckKit` against PDFs it writes by hand. |
 
-`scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`, signed ad hoc with
-`Resources/Pluck.entitlements` (R7.6): the App Sandbox, network client (GitHub's update check, and WebKit,
-whose web content process won't start without it), read-write access to files the user picks, and the
-Downloads folder for updates. `Resources/container-migration.plist` goes into the bundle; on the first
-sandboxed launch macOS moves the preferences into the container.
+`scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`, signed with
+`Resources/Pluck.entitlements` (R7.6): the App Sandbox, network client (GitHub's update check, and WebKit, whose web
+content process won't start without it), read-write access to files the user picks, and the Downloads folder for
+updates. `Resources/container-migration.plist` goes into the bundle; on the first sandboxed launch macOS moves the
+preferences into the container.
+
+`scripts/sign-app.sh` signs the app with the first Developer ID Application certificate in the keychain, with the
+hardened runtime and a secure timestamp, or ad hoc when there is none (`SIGNING_IDENTITY` overrides it). On GitHub,
+`scripts/add-signing-certificate.sh` puts the certificate from the `DEVELOPER_ID_CERTIFICATE` and
+`DEVELOPER_ID_CERTIFICATE_PASSWORD` secrets into a temporary keychain; without it a release fails and a trial build
+is signed ad hoc. For a release, `scripts/notarize.sh` signs the disk image, has Apple's notary service check it
+(the `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID` and `NOTARY_PASSWORD` secrets, or a notarytool keychain profile on a Mac)
+and staples the ticket to it. The team ID is kept only in the secrets and the keychain.
 
 ## Extraction pipeline
 

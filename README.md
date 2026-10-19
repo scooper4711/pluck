@@ -74,7 +74,8 @@ macOS 15 or later.
 Download the disk image from the [releases page](https://github.com/scooper4711/pluck/releases), open it and
 drag Pluck to Applications.
 
-The app is not notarized by Apple, so macOS blocks it the first time:
+Releases are signed with the Developer ID and notarized by Apple, so macOS opens them like any other app. Older
+releases aren't, and macOS blocks them the first time:
 
 1. Open Pluck once. macOS says it cannot be opened; click Done.
 2. Open System Settings › Privacy & Security and scroll down to the message about Pluck.
@@ -117,8 +118,9 @@ make dmg      # packages the app into a disk image
 make icon     # redraws Resources/AppIcon.icns
 ```
 
-Building needs Xcode 16 or later (Swift 6 toolchain). The app is ad-hoc signed. `swift run Pluck` runs it
-unbundled for development.
+Building needs Xcode 16 or later (Swift 6 toolchain). `scripts/sign-app.sh` signs the app with the Developer ID when
+the keychain holds a Developer ID Application certificate, and ad hoc otherwise. `swift run Pluck` runs it unbundled
+for development.
 
 The tests write their own PDFs object by object (`Tests/PluckKitTests/Support/PDFBuilder.swift`), so every
 color space, mask type and nesting case is exercised deterministically.
