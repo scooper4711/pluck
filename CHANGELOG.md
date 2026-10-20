@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-10-20
+
+### Added
+- Preview selected images with Space
+- Open titles from Scrollkeeper
+- Run Pluck in the App Sandbox
+
+### Fixed
+- Bundle the universal binary from where SwiftPM built it
+
+### Changed
+- Specify Open from Scrollkeeper and Space preview
+- Specify the App Sandbox
+- Allow trial release builds run by hand
+- Build into build/ like the other toolkit apps
+
+[1.1.1]: https://github.com/scooper4711/pluck/releases/tag/v1.1.1
+
 ## [1.1.0] - 2026-10-15
 
 ### Added
