@@ -69,6 +69,10 @@ It works on the user's own PDFs on their device. Tests use small PDFs they make 
 
 ## Commits
 
+- **Signed commits are welcome**
+  ([SSH or GPG signing](https://docs.github.com/en/authentication/managing-commit-signature-verification)), but not
+  required: `main` accepts only verified commits, so the maintainer re-signs unsigned ones before merging. You stay
+  credited as the author.
 - Each commit is one coherent step that builds and passes its tests.
 - Start the message with a type (`feat`, `fix`, `refactor`, `docs`, `test`, `style`, `chore`, or `chore(ci)` for
   CI), then a capitalized summary of what changes for the user, with no period:
