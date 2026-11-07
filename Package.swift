@@ -9,17 +9,28 @@ let package = Package(
         .library(name: "PluckKit", targets: ["PluckKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0")
+        .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0"),
+        // Moves to the release with TablesideShared once scooper4711/tabletop-kit#28 is merged.
+        .package(url: "https://github.com/scooper4711/tabletop-kit.git", branch: "feat/tableside-shared")
     ],
     targets: [
         .target(
             name: "PluckKit",
-            dependencies: [.product(name: "libwebp", package: "libwebp-Xcode")]
+            dependencies: [
+                .product(name: "libwebp", package: "libwebp-Xcode"),
+                .product(name: "TablesideShared", package: "tabletop-kit")
+            ]
         ),
-        .executableTarget(name: "Pluck", dependencies: ["PluckKit"]),
+        .executableTarget(
+            name: "Pluck",
+            dependencies: ["PluckKit", .product(name: "TablesideShared", package: "tabletop-kit")]
+        ),
         .testTarget(
             name: "PluckKitTests",
-            dependencies: ["PluckKit", .product(name: "libwebp", package: "libwebp-Xcode")]
+            dependencies: [
+                "PluckKit", .product(name: "libwebp", package: "libwebp-Xcode"),
+                .product(name: "TablesideShared", package: "tabletop-kit")
+            ]
         )
     ],
     swiftLanguageModes: [.v5]

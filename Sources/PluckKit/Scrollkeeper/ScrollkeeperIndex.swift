@@ -14,6 +14,11 @@ public struct ScrollkeeperIndex: Decodable, Equatable, Sendable {
         public var number: Int?
         /// Whether an up-to-date copy is on disk.
         public var downloaded: Bool
+        /// The cover Scrollkeeper keeps in the App Group; nil when the list came as a file or has none.
+        public var coverURL: URL?
+        /// The PDFs to open straight from Scrollkeeper's shared download folder, without asking Scrollkeeper;
+        /// empty when the title isn't there.
+        public var localFiles: [URL] = []
 
         public init(sku: String, title: String, kind: String, series: String? = nil, number: Int? = nil,
                     downloaded: Bool = true) {
@@ -67,5 +72,12 @@ public struct ScrollkeeperIndex: Decodable, Equatable, Sendable {
             let text = entry.searchText
             return words.allSatisfy { text.contains($0) }
         }
+    }
+}
+
+extension ScrollkeeperIndex.Entry {
+    /// The fields of the handed-over index; `coverURL` and `localFiles` come from the library list instead.
+    private enum CodingKeys: String, CodingKey {
+        case sku, title, kind, series, number, downloaded
     }
 }

@@ -1,5 +1,6 @@
 import AppKit
 import PluckKit
+import TablesideShared
 import SwiftUI
 
 @main
@@ -31,12 +32,17 @@ struct PluckApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let router = DocumentRouter()
     let recents = RecentDocuments(store: SystemRecentDocuments())
-    let scrollkeeper = ScrollkeeperBridge(launcher: WorkspaceLauncher())
+    let scrollkeeper = ScrollkeeperBridge(launcher: WorkspaceLauncher(),
+                                          libraryFolder: ToolkitGroup.scrollkeeperFolder())
+    private var libraryChanges: LibraryChangeObserver?
 
     func applicationDidFinishLaunching(_: Notification) {
         // Lets the bare executable from `swift run` behave like the bundled app.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        scrollkeeper.openDocuments = { [router] urls in router.open(urls) }
+        // Scrollkeeper says when it rewrites its library list, so an open list follows its downloads.
+        libraryChanges = LibraryChangeObserver { [weak self] in self?.scrollkeeper.refreshLibrary() }
         Task { await UpdateAlerts.checkAtLaunch(.shared) }
     }
 

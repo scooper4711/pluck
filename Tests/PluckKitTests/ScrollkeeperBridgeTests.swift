@@ -121,7 +121,7 @@ import Testing
 }
 
 @MainActor
-private final class FakeLauncher: ApplicationLauncher {
+final class FakeLauncher: ApplicationLauncher {
     var installed = true
     var openedURLs: [URL] = []
     var backgroundURLs: [URL] = []
