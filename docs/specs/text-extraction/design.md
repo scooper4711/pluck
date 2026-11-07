@@ -85,6 +85,13 @@ characters through, and drops what follows in the same place. Matching
 characters by their boxes alone is not safe: a ligature's letters share one
 box, so "ff" would lose an f.
 
+The second copy starts where a character's right edge falls back behind the
+previous one's. Left edges can't tell: on macOS 27 PDFKit gives the first
+copy's last character a box stretching back over the line (and the second
+copy's first few characters similar ones). That box is replaced with one just
+after the character before it, as wide as that one, so the character keeps its
+place in the line.
+
 ## HTML preview
 
 The app shows HTML in a `WKWebView` (`HTMLPreviewView`) wrapped in a page that

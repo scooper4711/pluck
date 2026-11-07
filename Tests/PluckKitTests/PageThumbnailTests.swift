@@ -20,8 +20,10 @@ struct PageThumbnailTests {
     @Test("What a form field shows is drawn on the page")
     func formFieldAppearance() throws {
         let builder = PDFBuilder()
+        // A resource dictionary, as real appearance streams have (PDF 2.0 requires one): without it, macOS 27
+        // draws the stream's fills black.
         let appearance = builder.addStream(
-            "/Type /XObject /Subtype /Form /BBox [0 0 100 100]", data: Self.redSquare)
+            "/Type /XObject /Subtype /Form /BBox [0 0 100 100] /Resources << >>", data: Self.redSquare)
         let field = builder.addFormField("""
             << /Type /Annot /Subtype /Widget /FT /Tx /T (name) /V (Eagan) /F 4 \
             /Rect [0 0 100 100] /AP << /N \(appearance) 0 R >> >>

@@ -42,8 +42,8 @@ struct PageTextReader {
             let text = string.substring(with: range)
             if text.unicodeScalars.allSatisfy(CharacterSet.newlines.contains) {
                 builder.endFragment()
-            } else if let frame = page.selection(for: range)?.bounds(for: page), isSensible(frame),
-                      overprints.admit(frame) {
+            } else if let box = page.selection(for: range)?.bounds(for: page), isSensible(box),
+                      let frame = overprints.admitted(box) {
                 add(text, frame: frame, to: &builder)
             }
         }
@@ -73,13 +73,17 @@ struct PageTextReader {
 /// The stretches of baseline where the page paints the same string twice in the same place:
 /// outlined and shadowed type is drawn as two copies, and PDFKit reports both. The first copy's
 /// characters are let through; once it has been read to its end, or the text jumps back to the
-/// start, everything else there is the second copy.
+/// start, everything else there is the second copy. The jump is told by the characters' right edges:
+/// on macOS 27 PDFKit gives the first copy's last character a box stretching back over the line,
+/// whose left edge would look like a jump. That box is replaced with one just after the character
+/// before it, as wide as that one.
 private struct OverprintedSpans {
     private struct Region {
         let box: CGRect
         let endX: CGFloat
         let size: CGFloat
-        var lastMinX = -CGFloat.infinity
+        var lastMaxX = -CGFloat.infinity
+        var lastWidth: CGFloat = 0
         var isRead = false
     }
 
@@ -98,18 +102,24 @@ private struct OverprintedSpans {
         }
     }
 
-    /// False for a character that belongs to a second copy.
-    mutating func admit(_ frame: CGRect) -> Bool {
+    /// The character's box, repaired when it stretches back over the line; nil for a character that
+    /// belongs to a second copy.
+    mutating func admitted(_ frame: CGRect) -> CGRect? {
         let center = CGPoint(x: frame.midX, y: frame.midY)
-        guard let index = regions.firstIndex(where: { $0.box.contains(center) }) else { return true }
+        guard let index = regions.firstIndex(where: { $0.box.contains(center) }) else { return frame }
         let region = regions[index]
-        if region.isRead || frame.minX < region.lastMinX - region.size * 0.2 {
+        let slack = region.size * 0.2
+        if region.isRead || frame.maxX < region.lastMaxX - slack {
             regions[index].isRead = true
-            return false
+            return nil
         }
-        regions[index].lastMinX = frame.minX
-        if frame.maxX >= region.endX - region.size * 0.15 { regions[index].isRead = true }
-        return true
+        let stretchesBack = frame.minX < region.lastMaxX - slack
+        let box = stretchesBack
+            ? CGRect(x: region.lastMaxX, y: frame.minY, width: region.lastWidth, height: frame.height) : frame
+        regions[index].lastMaxX = box.maxX
+        regions[index].lastWidth = box.width
+        if box.maxX >= region.endX - region.size * 0.15 { regions[index].isRead = true }
+        return box
     }
 
     /// Two spans in the same font that start and end within a shadow's offset of each other.
