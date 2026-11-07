@@ -10,8 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0"),
-        // Moves to the release with TablesideShared once scooper4711/tabletop-kit#28 is merged.
-        .package(url: "https://github.com/scooper4711/tabletop-kit.git", branch: "feat/tableside-shared")
+        .package(url: "https://github.com/scooper4711/tabletop-kit.git", from: "0.16.0")
     ],
     targets: [
         .target(
