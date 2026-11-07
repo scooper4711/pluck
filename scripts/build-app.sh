@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Builds build/Pluck.app from the Swift package (release configuration, ad-hoc signed).
+# Builds build/Pluck.app from the Swift package (release configuration).
 #
 # Usage: scripts/build-app.sh [--install]   (--install moves it to /Applications)
 #
 # VERSION    version written to the bundle (default 0.0.0)
 # UNIVERSAL  set to 1 to build for both Apple silicon and Intel
+# TEAM_ID    the team that owns the App Group (default: read from the Developer ID certificate)
+# SIGNING_IDENTITY  passed to scripts/sign-app.sh; "-" signs ad hoc, without the App Group
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -33,8 +35,22 @@ cp Resources/Credits.html "$APP/Contents/Resources/Credits.html"
 cp Resources/container-migration.plist "$APP/Contents/Resources/container-migration.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" -c "Set :CFBundleVersion $VERSION" \
     "$APP/Contents/Info.plist"
-# The entitlements turn on the App Sandbox.
-scripts/sign-app.sh "$APP" Resources/Pluck.entitlements
+# The entitlements turn on the App Sandbox. A build signed with the team's Developer ID also joins the Tableside
+# Toolkit's App Group, where Scrollkeeper shares its library: the team's ID takes the place of TEAM_ID. The team ID
+# is read from the signing certificate, or from TEAM_ID in the environment, and never committed. An ad hoc
+# signature can't join the group, so its build leaves the group out and asks Scrollkeeper for the list instead.
+ENTITLEMENTS="build/Pluck.entitlements"
+if [[ "${SIGNING_IDENTITY:-}" != "-" ]]; then
+    TEAM_ID="${TEAM_ID:-$(security find-identity -v -p codesigning \
+        | sed -n 's/.*"Developer ID Application: .*(\([A-Z0-9]*\))"$/\1/p' | head -n 1)}"
+fi
+if [[ -n "${TEAM_ID:-}" ]]; then
+    sed "s/TEAM_ID/$TEAM_ID/" Resources/Pluck.entitlements > "$ENTITLEMENTS"
+else
+    cp Resources/Pluck.entitlements "$ENTITLEMENTS"
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.security.application-groups" "$ENTITLEMENTS"
+fi
+scripts/sign-app.sh "$APP" "$ENTITLEMENTS"
 echo "Built $APP ($VERSION)"
 
 if [[ "${1:-}" == "--install" ]]; then

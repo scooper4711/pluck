@@ -10,5 +10,12 @@
     <true/>
     <key>com.apple.security.files.downloads.read-write</key>
     <true/>
+    <!-- Scrollkeeper's folder in the Tableside Toolkit's App Group: its library list, covers and downloads, which
+         Pluck reads. scripts/build-app.sh puts the signing team's ID in place of TEAM_ID, and leaves the group
+         out of an ad hoc build. -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>TEAM_ID.io.github.scooper4711.tableside</string>
+    </array>
 </dict>
 </plist>
