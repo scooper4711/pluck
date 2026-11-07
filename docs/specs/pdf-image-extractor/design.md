@@ -12,8 +12,9 @@ A Swift package with three targets:
 
 `scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`, signed with
 `Resources/Pluck.entitlements` (R7.6): the App Sandbox, network client (GitHub's update check, and WebKit, whose web
-content process won't start without it), read-write access to files the user picks, and the Downloads folder for
-updates. `Resources/container-migration.plist` goes into the bundle; on the first sandboxed launch macOS moves the
+content process won't start without it), read-write access to files the user picks, the Downloads folder for
+updates, and the Tableside Toolkit's App Group (`TEAM_ID.io.github.scooper4711.tableside`, R8.5), into which the
+script puts the team of the Developer ID certificate (or `TEAM_ID`), leaving it out of an ad hoc build. `Resources/container-migration.plist` goes into the bundle; on the first sandboxed launch macOS moves the
 preferences into the container.
 
 `scripts/sign-app.sh` signs the app with the first Developer ID Application certificate in the keychain, with the
@@ -133,8 +134,21 @@ newer format version. `open(_:)` asks in the background and records a
 status links (`isStatusLink`) go to `receiveStatus(_:)`, which moves the request
 through requested, downloading, opening or failed, or marks a failed list
 request (empty SKU). `ScrollkeeperWindow` is a separate `Window` scene.
-Mapsmith has the same search; when a third app needs it, it moves into a shared
-package.
+
+With the App Group (R8.5–R8.7) the bridge, made with
+`ToolkitGroup.scrollkeeperFolder()`, first reads Scrollkeeper's `library.json`
+(`ScrollkeeperLibrary.read(from:)`); a missing, unreadable or newer list falls
+back to the index request. These come from tabletop-kit's `TablesideShared`,
+which Scrollkeeper writes with and Mapsmith reads with too.
+`ScrollkeeperLibrary.pluckIndex(in:)` keeps the titles with a PDF edition or an
+unpacked archive and gives each entry its `coverURL` and, when the download
+folder is the shared one, `localFiles` (`filesToOpen(in:accepting:)`, PDFs
+only); neither is decoded from the handed-over index. `open(_:)` hands
+`localFiles` to `openDocuments`, which `AppDelegate` points at the document
+router, instead of sending a request. `AppDelegate` keeps a
+`LibraryChangeObserver` that calls `refreshLibrary()`, which reads the list
+again only while the list shown came from it. Each row shows the cover
+(`CoverThumbnail`, read off the main thread).
 
 ## Known limits
 
