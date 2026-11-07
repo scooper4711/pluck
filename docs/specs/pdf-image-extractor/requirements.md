@@ -100,3 +100,16 @@ image inside it for copying, dragging out, or exporting as WebP.
   it), hasn't answered after 15 seconds (with buttons to open Scrollkeeper or
   try again), couldn't send the list (with its reason, such as needing to sign
   in), or handed over a list Pluck can't read or that is in a newer format.
+- R8.5 When Scrollkeeper shares its library through the Tableside Toolkit's
+  App Group (Scrollkeeper's app-handoff requirements 5 and 6), Pluck reads the
+  titles from there at once, without asking Scrollkeeper, and shows each
+  title's cover. It lists the titles with a PDF, or with an archive
+  Scrollkeeper unpacks, as Scrollkeeper's own list for Pluck does. Without
+  that, or when the shared list is in a format Pluck doesn't know, it asks as
+  in R8.2.
+- R8.6 A list read from the App Group follows Scrollkeeper's changes while the
+  window is open, such as a download finishing.
+- R8.7 A title already up to date in Scrollkeeper's shared download folder
+  opens straight from there, without asking Scrollkeeper: its single PDF, or
+  the PDFs of an unpacked archive. A title in a download folder the user chose
+  in Scrollkeeper, which Pluck can't read, is still asked for (R8.3).

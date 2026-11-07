@@ -1,4 +1,5 @@
 import Foundation
+import TablesideShared
 import Observation
 
 /// What Pluck needs from the system to work with another app. The app uses `NSWorkspace`; tests use a fake.
@@ -31,9 +32,9 @@ extension ScrollkeeperRequest.Phase {
     }
 }
 
-/// Scrollkeeper as Pluck sees it: Pluck asks for the list of titles, Scrollkeeper hands it over as a file
-/// (which a sandboxed app may then read), and Pluck asks it to open a title, whose PDFs Scrollkeeper opens
-/// in Pluck.
+/// Scrollkeeper as Pluck sees it: Pluck reads the list of titles from Scrollkeeper's folder in the App Group, or
+/// asks for it and has it handed over as a file (which a sandboxed app may then read), and asks Scrollkeeper to open
+/// a title, whose PDFs Scrollkeeper opens in Pluck. A title already in the shared folder opens straight from there.
 @MainActor
 @Observable
 public final class ScrollkeeperBridge {
@@ -54,24 +55,40 @@ public final class ScrollkeeperBridge {
 
     public private(set) var state = State.idle
     public private(set) var request: ScrollkeeperRequest?
+    /// Opens the PDFs of a title that is on disk, which needs no request.
+    @ObservationIgnored public var openDocuments: ([URL]) -> Void = { _ in }
     @ObservationIgnored private let launcher: ApplicationLauncher
+    /// Scrollkeeper's folder in the App Group; nil when Pluck isn't in the group.
+    @ObservationIgnored private let libraryFolder: URL?
+    /// True while the list shown was read from the library list, which is read again when it changes.
+    @ObservationIgnored private var isShowingLibrary = false
 
-    public init(launcher: ApplicationLauncher) {
+    public init(launcher: ApplicationLauncher, libraryFolder: URL? = nil) {
         self.launcher = launcher
+        self.libraryFolder = libraryFolder
     }
 
-    /// Asks Scrollkeeper, staying in the background, to hand over the list of titles.
+    /// Reads the list of titles from Scrollkeeper's library list, or when there is none, asks Scrollkeeper,
+    /// staying in the background, to hand it over.
     public func requestIndex() {
         guard launcher.isInstalled(Self.bundleIdentifier) else {
             state = .notInstalled
             return
         }
+        if readLibrary() { return }
         state = .waiting
         launcher.openInBackground(Self.requestURL(host: "index", sku: nil))
     }
 
+    /// Reads the library list again after Scrollkeeper says it changed, while the list shown came from it.
+    public func refreshLibrary() {
+        guard isShowingLibrary else { return }
+        _ = readLibrary()
+    }
+
     /// Reads the list Scrollkeeper handed over.
     public func receive(_ file: URL) {
+        isShowingLibrary = false
         guard let data = try? Data(contentsOf: file),
               let header = try? Self.decoder.decode(FormatHeader.self, from: data) else {
             state = .unreadable
@@ -88,9 +105,14 @@ public final class ScrollkeeperBridge {
         state = .loaded(index)
     }
 
-    /// Asks Scrollkeeper, staying in the background, to download the title when needed and open its PDFs in
-    /// Pluck. Scrollkeeper reports how it goes with status links (`receiveStatus`).
+    /// Opens the title's PDFs when they are in the shared folder; otherwise asks Scrollkeeper, staying in the
+    /// background, to download the title when needed and open its PDFs in Pluck. Scrollkeeper reports how that goes
+    /// with status links (`receiveStatus`).
     public func open(_ entry: ScrollkeeperIndex.Entry) {
+        guard entry.localFiles.isEmpty else {
+            openDocuments(entry.localFiles)
+            return
+        }
         request = ScrollkeeperRequest(sku: entry.sku, phase: .requested)
         launcher.openInBackground(Self.requestURL(host: "open", sku: entry.sku))
     }
@@ -123,6 +145,15 @@ public final class ScrollkeeperBridge {
     }
 
     private static let statusScheme = "pluck"
+
+    /// True when the library list was read: one Pluck understands, in the App Group.
+    private func readLibrary() -> Bool {
+        guard let folder = libraryFolder, case let .loaded(library) = ScrollkeeperLibrary.read(from: folder)
+        else { return false }
+        state = .loaded(library.pluckIndex(in: folder))
+        isShowingLibrary = true
+        return true
+    }
 
     /// Brings Scrollkeeper forward, so the user can sign in and load their library.
     public func launchScrollkeeper() {
