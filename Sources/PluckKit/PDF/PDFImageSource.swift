@@ -19,7 +19,7 @@ public struct PageScanResult: Sendable {
 public final class PDFImageSource: @unchecked Sendable {
     public static let thumbnailDimension = 400
 
-    private static let logger = Logger(subsystem: "io.github.scooper4711.pluck", category: "extraction")
+    private static let logger = Logger(subsystem: "io.github.scooper4711.Pluck", category: "extraction")
 
     public let pageCount: Int
 
