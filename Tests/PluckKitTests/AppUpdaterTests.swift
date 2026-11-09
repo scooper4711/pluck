@@ -1,3 +1,4 @@
+#if !APP_STORE
 import Foundation
 import Testing
 @testable import PluckKit
@@ -194,3 +195,4 @@ final class StubWeb: URLProtocol, @unchecked Sendable {
         #expect(updater.product.name == "Pluck" && updater.state == .idle)
     }
 }
+#endif

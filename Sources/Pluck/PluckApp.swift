@@ -15,7 +15,9 @@ struct PluckApp: App {
         }
         .defaultSize(width: 1180, height: 760)
         .commands {
+            #if !APP_STORE
             UpdateCommands(updater: .shared)
+            #endif
             PluckCommands(router: appDelegate.router, recents: appDelegate.recents)
         }
 
@@ -43,7 +45,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         scrollkeeper.openDocuments = { [router] urls in router.open(urls) }
         // Scrollkeeper says when it rewrites its library list, so an open list follows its downloads.
         libraryChanges = LibraryChangeObserver { [weak self] in self?.scrollkeeper.refreshLibrary() }
+        #if !APP_STORE
         Task { await UpdateAlerts.checkAtLaunch(.shared) }
+        #endif
     }
 
     /// Finder's "Open With", the Dock's recent items, files dropped on the Dock icon, and the list, status
