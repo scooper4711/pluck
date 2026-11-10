@@ -67,7 +67,8 @@ echo "Built $APP ($VERSION)"
 
 if [[ "${CHANNEL:-}" == "appstore" ]]; then
     # The App Store build must not update itself (guideline 2.4.5(vii)).
-    if strings "$APP/Contents/MacOS/$EXECUTABLE" | grep -q -E "AppUpdater|api\.github\.com"; then
+    # grep reads the binary itself: piped from strings, grep -q leaving early fails the pipeline under pipefail.
+    if grep -q -a -E "AppUpdater|api\.github\.com" "$APP/Contents/MacOS/$EXECUTABLE"; then
         echo "The App Store build still contains the updater." >&2
         exit 1
     fi
