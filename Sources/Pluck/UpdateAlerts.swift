@@ -1,3 +1,4 @@
+#if !APP_STORE
 import AppKit
 import PluckKit
 import SwiftUI
@@ -76,3 +77,4 @@ struct UpdateCommands: Commands {
         }
     }
 }
+#endif

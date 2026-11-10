@@ -1,4 +1,4 @@
-.PHONY: build test lint coverage app run install dmg icon clean
+.PHONY: build test lint coverage app run install dmg appstore icon clean
 
 build:
 	swift build
@@ -25,6 +25,11 @@ install:
 
 dmg: app
 	scripts/make-dmg.sh
+
+# Builds the Mac App Store package, build/appstore/Pluck.pkg (see scripts/build-app.sh for the variables).
+appstore:
+	swift package resolve
+	CHANNEL=appstore scripts/build-app.sh
 
 # Redraws Resources/AppIcon.icns from scripts/make-icon.swift.
 icon:

@@ -23,6 +23,9 @@ struct PluckCommands: Commands {
                     .disabled(recents.urls.isEmpty)
             }
         }
+        CommandGroup(replacing: .help) {
+            Link("Pluck Privacy Policy", destination: AppLinks.privacyPolicy)
+        }
         CommandGroup(after: .pasteboard) {
             Button("Copy All Stat Blocks") { actions?.copyStatBlocks() }
                 .keyboardShortcut("c", modifiers: [.command, .option])
@@ -52,11 +55,19 @@ struct PluckCommands: Commands {
     }
 }
 
+enum AppLinks {
+    // A literal URL that is known to parse.
+    // swiftlint:disable:next force_unwrapping
+    static let privacyPolicy = URL(string: "https://github.com/scooper4711/pluck/blob/main/PRIVACY.md")!
+}
+
 struct SettingsView: View {
     @AppStorage(WebPOptions.losslessDefaultsKey) private var isLossless = false
     @AppStorage(WebPOptions.qualityDefaultsKey) private var quality = WebPOptions.defaultQuality
     @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
+    #if !APP_STORE
     @AppStorage(AppUpdater.checksAtLaunchKey) private var checksForUpdatesAtLaunch = true
+    #endif
 
     var body: some View {
         Form {
@@ -76,15 +87,23 @@ struct SettingsView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            Section("Updates") {
-                Toggle("Check for updates when Pluck opens", isOn: $checksForUpdatesAtLaunch)
-                Text("Pluck asks GitHub whether a newer version has been released, and tells you only when there "
-                     + "is one. Pluck › Check for Updates… checks at any time.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+            #if !APP_STORE
+            updatesSection
+            #endif
         }
         .formStyle(.grouped)
         .frame(width: 400)
     }
+
+    #if !APP_STORE
+    private var updatesSection: some View {
+        Section("Updates") {
+            Toggle("Check for updates when Pluck opens", isOn: $checksForUpdatesAtLaunch)
+            Text("Pluck asks GitHub whether a newer version has been released, and tells you only when there "
+                 + "is one. Pluck › Check for Updates… checks at any time.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+    #endif
 }

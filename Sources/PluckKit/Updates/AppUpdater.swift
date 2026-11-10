@@ -1,3 +1,4 @@
+#if !APP_STORE
 import Foundation
 import Observation
 
@@ -219,3 +220,4 @@ private struct GitHubAsset: Decodable {
         case address = "browser_download_url"
     }
 }
+#endif
