@@ -22,12 +22,12 @@ SWIFT_FLAGS=()
 [[ "${CHANNEL:-}" == "appstore" ]] && SWIFT_FLAGS=(-Xswiftc -DAPP_STORE)
 
 if [[ "${UNIVERSAL:-0}" == "1" ]]; then
-    swift build -c release "${SWIFT_FLAGS[@]}" --product "$EXECUTABLE" --arch arm64 --arch x86_64
+    swift build -c release ${SWIFT_FLAGS[@]+"${SWIFT_FLAGS[@]}"} --product "$EXECUTABLE" --arch arm64 --arch x86_64
     # Asked rather than assumed: newer SwiftPM moved universal builds out of .build/apple, and a copy left
     # there by an older toolchain would otherwise be bundled instead.
     BINARY="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/$EXECUTABLE"
 else
-    swift build -c release "${SWIFT_FLAGS[@]}" --product "$EXECUTABLE"
+    swift build -c release ${SWIFT_FLAGS[@]+"${SWIFT_FLAGS[@]}"} --product "$EXECUTABLE"
     BINARY="$(swift build -c release --show-bin-path)/$EXECUTABLE"
 fi
 
