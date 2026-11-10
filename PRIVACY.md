@@ -13,7 +13,8 @@ makes no network requests of its own.
 - **Your settings**, such as the WebP quality and the text options, and **recent files**, are saved on your Mac.
   Open Recent's Clear Menu forgets the files.
 
-Deleting the app deletes the rest.
+Deleting the app from your Mac leaves this behind: macOS keeps an app's saved data in the Containers folder of
+your Library folder until you delete the folder named Pluck there.
 
 ## Other apps on your Mac
 
