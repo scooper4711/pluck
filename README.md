@@ -161,5 +161,9 @@ Pluck is released under the [MIT license](LICENSE). It encodes WebP with Google'
 
 ## Trademarks
 
-Pathfinder is a trademark of Paizo Inc. Pluck is an independent project. It is not published, endorsed, or
-specifically approved by Paizo, and it contains no Paizo content.
+Pathfinder is a trademark of Paizo Inc. Pluck is an independent project and contains no Paizo content.
+
+Pluck uses trademarks and/or copyrights owned by Paizo Inc., used under Paizo's Community Use Policy
+([paizo.com/licenses/communityuse](https://paizo.com/licenses/communityuse)). We are expressly prohibited from
+charging you to use or access this content. Pluck is not published, endorsed, or specifically approved by
+Paizo. For more information about Paizo Inc. and Paizo products, visit [paizo.com](https://paizo.com).
