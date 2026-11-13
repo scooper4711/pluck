@@ -1,3 +1,4 @@
+import AppNotices
 import PluckKit
 import QuickLook
 import SwiftUI
@@ -13,6 +14,8 @@ struct ContentView: View {
     /// The selected images Quick Look shows, as temporary PNGs (Space, as in Finder).
     @State private var previewFile: URL?
     @State private var previewFiles: [URL] = []
+    @State private var isDropTargeted = false
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         NavigationSplitView {
@@ -23,7 +26,7 @@ struct ContentView: View {
         }
         .navigationTitle(model.documentURL?.lastPathComponent ?? "Pluck")
         .toolbar { PluckToolbar(model: model, actions: actions, thumbnailSize: $thumbnailSize) }
-        .dropDestination(for: URL.self) { urls, _ in openDropped(urls) }
+        .dropDestination(for: URL.self) { urls, _ in openDropped(urls) } isTargeted: { isDropTargeted = $0 }
         .alert("Password Required", isPresented: isAskingForPassword) {
             SecureField("Password", text: $password)
             Button("Open", action: submitPassword)
@@ -36,13 +39,10 @@ struct ContentView: View {
     @ViewBuilder private var detail: some View {
         switch model.phase {
         case .empty, .passwordRequired:
-            ContentUnavailableView {
-                Label("Open a PDF", systemImage: "photo.on.rectangle.angled")
-            } description: {
-                Text("Drop a PDF here to pull out its images.")
-            } actions: {
-                Button("Open…", action: actions.chooseDocuments)
-            }
+            EmptyWindowView(
+                title: "Open a PDF", symbol: "photo.on.rectangle.angled",
+                message: "Drop a PDF here to pull out its images.", isDropTargeted: isDropTargeted,
+                open: actions.chooseDocuments, openFromScrollkeeper: { openWindow(id: ScrollkeeperWindow.id) })
         case .failed(let message):
             ContentUnavailableView("Couldn’t Open the PDF", systemImage: "exclamationmark.triangle",
                                    description: Text(message))

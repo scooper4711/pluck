@@ -10,7 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0"),
-        .package(url: "https://github.com/scooper4711/tabletop-kit.git", from: "0.17.0")
+        .package(url: "https://github.com/scooper4711/tabletop-kit.git", from: "1.0.0")
     ],
     targets: [
         .target(
@@ -22,7 +22,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "Pluck",
-            dependencies: ["PluckKit", .product(name: "TablesideShared", package: "tabletop-kit")]
+            dependencies: [
+                "PluckKit", .product(name: "AppNotices", package: "tabletop-kit"),
+                .product(name: "TablesideShared", package: "tabletop-kit")
+            ]
         ),
         .testTarget(
             name: "PluckKitTests",
