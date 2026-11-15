@@ -1,6 +1,5 @@
-import AppKit
-import PluckKit
 import SwiftUI
+import TablesideShared
 
 /// File ▸ Open from Scrollkeeper…: search the titles with a PDF the user owns and ask Scrollkeeper for one,
 /// which it downloads when needed and opens in Pluck.
@@ -31,8 +30,8 @@ struct ScrollkeeperWindow: View {
         .padding(20)
         .frame(width: 560, height: 480)
         .onAppear(perform: bridge.requestIndex)
-        .onChange(of: bridge.request?.phase) { _, phase in
-            if phase == .opening { dismissWindow(id: Self.id) }
+        .onChange(of: request?.phase) { _, phase in
+            if phase == .done { dismissWindow(id: Self.id) }
         }
         .task(id: bridge.state) {
             isSlow = false
@@ -41,6 +40,9 @@ struct ScrollkeeperWindow: View {
             isSlow = !Task.isCancelled
         }
     }
+
+    /// The title asked for; Pluck asks for one at a time.
+    private var request: ScrollkeeperRequest? { bridge.requests.values.first }
 
     private var loadedIndex: ScrollkeeperIndex? {
         if case let .loaded(index) = bridge.state { index } else { nil }
@@ -64,6 +66,12 @@ struct ScrollkeeperWindow: View {
             unavailable("Scrollkeeper Isn't Installed", symbol: "books.vertical",
                         message: "Scrollkeeper downloads the PDFs you own on paizo.com.") {
                 Button("Get Scrollkeeper") { openURL(ScrollkeeperBridge.downloadPage) }
+            }
+        case .noSharedLibrary:
+            unavailable("Scrollkeeper Hasn't Shared Your Library", symbol: "books.vertical",
+                        message: "Open Scrollkeeper and load your library, then try again.") {
+                Button("Open Scrollkeeper", action: bridge.launchScrollkeeper)
+                Button("Try Again", action: bridge.requestIndex)
             }
         case .unsupportedVersion:
             unavailable("Update Pluck", symbol: "arrow.down.circle",
@@ -103,7 +111,7 @@ struct ScrollkeeperWindow: View {
     private func results(_ entries: [ScrollkeeperIndex.Entry]) -> some View {
         List(entries, selection: $selection) { entry in
             HStack {
-                CoverThumbnail(url: entry.coverURL)
+                ScrollkeeperCoverThumbnail(url: entry.coverURL, placeholderSymbol: "doc.richtext")
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.title)
                     if !entry.subtitle.isEmpty {
@@ -127,10 +135,10 @@ struct ScrollkeeperWindow: View {
 
     /// The progress of the title being downloaded, or a cloud for titles not on disk yet.
     @ViewBuilder private func status(of entry: ScrollkeeperIndex.Entry) -> some View {
-        switch bridge.request?.sku == entry.sku ? bridge.request?.phase : nil {
+        switch bridge.request(for: entry)?.phase {
         case let .downloading(fraction):
             ProgressView(value: fraction).frame(width: 90)
-        case .requested, .opening:
+        case .requested, .done:
             ProgressView().controlSize(.small)
         case .failed:
             Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
@@ -156,7 +164,7 @@ struct ScrollkeeperWindow: View {
     }
 
     @ViewBuilder private var footnote: some View {
-        if let request = bridge.request, let text = Self.describe(request.phase) {
+        if let request, let text = Self.describe(request.phase) {
             Text(text)
                 .font(.caption)
                 .foregroundStyle(request.phase.isFailure ? .red : .secondary)
@@ -172,7 +180,7 @@ struct ScrollkeeperWindow: View {
         switch phase {
         case .requested: "Asking Scrollkeeper…"
         case let .downloading(fraction): "Scrollkeeper is downloading it: \(Int(fraction * 100))%"
-        case .opening: "Opening…"
+        case .done: "Opening…"
         case let .failed(reason): reason
         }
     }
@@ -183,49 +191,5 @@ struct ScrollkeeperWindow: View {
         guard let entry = selectedEntry else { return }
         bridge.open(entry)
         if entry.downloaded { dismissWindow(id: Self.id) }
-    }
-}
-
-/// A title's cover from Scrollkeeper's folder, or a document symbol when there is none, loaded off the main thread.
-private struct CoverThumbnail: View {
-    let url: URL?
-    @State private var image: NSImage?
-
-    var body: some View {
-        Group {
-            if let image {
-                Image(nsImage: image).resizable().scaledToFit()
-            } else {
-                Image(systemName: "doc.richtext").foregroundStyle(.secondary)
-            }
-        }
-        .frame(width: 28, height: 36)
-        .task(id: url) {
-            guard let url else { return }
-            let data = await Task.detached { try? Data(contentsOf: url) }.value
-            image = data.flatMap(NSImage.init(data:))
-        }
-    }
-}
-
-/// The system side of `ApplicationLauncher`.
-struct WorkspaceLauncher: ApplicationLauncher {
-    func isInstalled(_ bundleIdentifier: String) -> Bool {
-        NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) != nil
-    }
-
-    func open(_ url: URL) {
-        NSWorkspace.shared.open(url)
-    }
-
-    func openInBackground(_ url: URL) {
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.activates = false
-        NSWorkspace.shared.open(url, configuration: configuration)
-    }
-
-    func launch(_ bundleIdentifier: String) {
-        guard let app = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) else { return }
-        NSWorkspace.shared.openApplication(at: app, configuration: .init())
     }
 }

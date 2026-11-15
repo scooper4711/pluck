@@ -34,7 +34,7 @@ struct PluckApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let router = DocumentRouter()
     let recents = RecentDocuments(store: SystemRecentDocuments())
-    let scrollkeeper = ScrollkeeperBridge(launcher: WorkspaceLauncher(),
+    let scrollkeeper = ScrollkeeperBridge(configuration: .pluck, launcher: WorkspaceLauncher(),
                                           libraryFolder: ToolkitGroup.scrollkeeperFolder())
     private var libraryChanges: LibraryChangeObserver?
 
@@ -55,7 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_: NSApplication, open urls: [URL]) {
         var documents: [URL] = []
         for url in urls {
-            if ScrollkeeperBridge.isStatusLink(url) {
+            if scrollkeeper.isStatusLink(url) {
                 scrollkeeper.receiveStatus(url)
             } else if ScrollkeeperIndex.isIndexFile(url) {
                 scrollkeeper.receive(url)
