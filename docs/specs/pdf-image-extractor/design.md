@@ -120,35 +120,35 @@ to PNGs in a new temporary folder and shows them with SwiftUI's
 
 ## Open from Scrollkeeper
 
-`ScrollkeeperBridge` (PluckKit) holds the window's state. `requestIndex()` opens
-`scrollkeeper://index?app=pluck` in the background through `ApplicationLauncher`
-(the app's `WorkspaceLauncher` wraps `NSWorkspace`; tests use a fake).
+`ScrollkeeperBridge`, from tabletop-kit's `TablesideShared` (its
+`docs/specs/tableside-shared`, R5), holds the window's state; Mapsmith uses the
+same bridge. Pluck configures it with `ScrollkeeperBridgeConfiguration.pluck`
+(PluckKit): the key and status scheme `pluck`, the library titles that may hold
+a PDF (a PDF edition or an archive Scrollkeeper unpacks), PDFs only, and one
+request at a time. `AppDelegate` makes it with the kit's `WorkspaceLauncher`,
+which wraps `NSWorkspace`, and `ToolkitGroup.scrollkeeperFolder()`.
+
+`requestIndex()` opens `scrollkeeper://index?app=pluck` in the background.
 Scrollkeeper writes the list and opens it with Pluck; `AppDelegate` passes files
 with the `scrollkeeperindex` extension to `receive(_:)` and the rest to the
 document router. `Info.plist` imports the file's type,
 `io.github.scooper4711.scrollkeeper.index`, and lists it as a document type, so
-Launch Services can open it with Pluck. `ScrollkeeperIndex` mirrors the format
-Scrollkeeper defines in its `docs/specs/app-handoff/design.md` and refuses a
-newer format version. `open(_:)` asks in the background and records a
-`ScrollkeeperRequest`; `Info.plist` registers the `pluck` URL scheme, and the
-status links (`isStatusLink`) go to `receiveStatus(_:)`, which moves the request
-through requested, downloading, opening or failed, or marks a failed list
-request (empty SKU). `ScrollkeeperWindow` is a separate `Window` scene.
+Launch Services can open it with Pluck. `open(_:)` asks in the background and
+records a `ScrollkeeperRequest`; `Info.plist` registers the `pluck` URL scheme,
+and the status links (`isStatusLink`) go to `receiveStatus(_:)`, which moves the
+request through requested, downloading, done or failed, or marks a failed list
+request (empty SKU). `ScrollkeeperWindow` is a separate `Window` scene; it shows
+the one request the bridge holds and closes when that request is done.
 
-With the App Group (R8.5–R8.7) the bridge, made with
-`ToolkitGroup.scrollkeeperFolder()`, first reads Scrollkeeper's `library.json`
-(`ScrollkeeperLibrary.read(from:)`); a missing, unreadable or newer list falls
-back to the index request. These come from tabletop-kit's `TablesideShared`,
-which Scrollkeeper writes with and Mapsmith reads with too.
-`ScrollkeeperLibrary.pluckIndex(in:)` keeps the titles with a PDF edition or an
-unpacked archive and gives each entry its `coverURL` and, when the download
-folder is the shared one, `localFiles` (`filesToOpen(in:accepting:)`, PDFs
-only); neither is decoded from the handed-over index. `open(_:)` hands
-`localFiles` to `openDocuments`, which `AppDelegate` points at the document
-router, instead of sending a request. `AppDelegate` keeps a
+With the App Group (R8.5–R8.7) the bridge first reads Scrollkeeper's
+`library.json`; a missing, unreadable or newer list falls back to the index
+request. Each entry gets its `coverURL` and, when the download folder is the
+shared one, `localFiles`; neither is decoded from the handed-over index.
+`open(_:)` hands `localFiles` to `openDocuments`, which `AppDelegate` points at
+the document router, instead of sending a request. `AppDelegate` keeps a
 `LibraryChangeObserver` that calls `refreshLibrary()`, which reads the list
 again only while the list shown came from it. Each row shows the cover
-(`CoverThumbnail`, read off the main thread).
+(the kit's `ScrollkeeperCoverThumbnail`, read off the main thread).
 
 ## Known limits
 

@@ -10,7 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0"),
-        .package(url: "https://github.com/scooper4711/tabletop-kit.git", from: "1.0.0")
+        .package(url: "https://github.com/scooper4711/tabletop-kit.git", from: "1.1.0")
     ],
     targets: [
         .target(
