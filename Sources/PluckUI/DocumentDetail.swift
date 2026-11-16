@@ -1,48 +1,27 @@
 import AppNotices
 import PluckKit
-import QuickLook
 import SwiftUI
 
-struct ContentView: View {
+/// What a window shows beside the page navigator: the way in when no PDF is open, and otherwise the PDF's
+/// images or its text, over the status bar.
+struct DocumentDetail: View {
     @Bindable var model: PluckModel
     let actions: AppActions
+    let thumbnailSize: Double
+    /// Whether a file is being dragged over the window, which outlines the empty window.
+    let isDropTargeted: Bool
+    let openFromScrollkeeper: () -> Void
 
-    @AppStorage("thumbnailSize") private var thumbnailSize = 180.0
     /// Read here so that changing the setting redraws the text.
     @AppStorage(TextRenderOptions.obsidianCalloutsDefaultsKey) private var usesObsidianCallouts = false
-    @State private var password = ""
-    /// The selected images Quick Look shows, as temporary PNGs (Space, as in Finder).
-    @State private var previewFile: URL?
-    @State private var previewFiles: [URL] = []
-    @State private var isDropTargeted = false
-    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        NavigationSplitView {
-            PageSidebar(model: model)
-                .navigationSplitViewColumnWidth(min: 150, ideal: 190, max: 900)
-        } detail: {
-            detail
-        }
-        .navigationTitle(model.documentURL?.lastPathComponent ?? "Pluck")
-        .toolbar { PluckToolbar(model: model, actions: actions, thumbnailSize: $thumbnailSize) }
-        .dropDestination(for: URL.self) { urls, _ in openDropped(urls) } isTargeted: { isDropTargeted = $0 }
-        .alert("Password Required", isPresented: isAskingForPassword) {
-            SecureField("Password", text: $password)
-            Button("Open", action: submitPassword)
-            Button("Cancel", role: .cancel) { password = "" }
-        } message: {
-            Text("“\(model.documentURL?.lastPathComponent ?? "This PDF")” is password-protected.")
-        }
-    }
-
-    @ViewBuilder private var detail: some View {
         switch model.phase {
         case .empty, .passwordRequired:
             EmptyWindowView(
                 title: "Open a PDF", symbol: "photo.on.rectangle.angled",
                 message: "Drop a PDF here to pull out its images.", isDropTargeted: isDropTargeted,
-                open: actions.chooseDocuments, openFromScrollkeeper: { openWindow(id: ScrollkeeperWindow.id) })
+                open: actions.chooseDocuments, openFromScrollkeeper: openFromScrollkeeper)
         case .failed(let message):
             ContentUnavailableView("Couldn’t Open the PDF", systemImage: "exclamationmark.triangle",
                                    description: Text(message))
@@ -52,6 +31,17 @@ struct ContentView: View {
             case .text: textOutput
             }
         }
+    }
+
+    private var imageGrid: some View {
+        ImageGrid(model: model, actions: actions, thumbnailSize: thumbnailSize)
+            .overlay {
+                if model.phase == .ready, model.visibleImages.isEmpty {
+                    ContentUnavailableView("No Images", systemImage: "photo",
+                                           description: Text("Nothing to show for the selected pages."))
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
     }
 
     private var textOutput: some View {
@@ -67,32 +57,6 @@ struct ContentView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
     }
 
-    private func togglePreview() {
-        guard previewFile == nil else {
-            previewFile = nil
-            return
-        }
-        Task {
-            guard let files = try? await model.previewSelection(), let first = files.first else { return }
-            previewFiles = files
-            previewFile = first
-        }
-    }
-
-    private var imageGrid: some View {
-        ImageGridView(
-            images: model.visibleImages, transforms: model.transforms, selection: $model.selectedImageIDs,
-            thumbnailSize: thumbnailSize, actions: actions, onSpace: togglePreview)
-            .quickLookPreview($previewFile, in: previewFiles)
-            .overlay {
-                if model.phase == .ready, model.visibleImages.isEmpty {
-                    ContentUnavailableView("No Images", systemImage: "photo",
-                                           description: Text("Nothing to show for the selected pages."))
-                }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) { StatusBar(model: model) }
-    }
-
     /// HTML is shown rendered; the other formats are shown as the text they are.
     @ViewBuilder private var textView: some View {
         if model.textFormat == .html {
@@ -100,25 +64,6 @@ struct ContentView: View {
         } else {
             TextOutputView(text: model.visibleText)
         }
-    }
-
-    private var isAskingForPassword: Binding<Bool> {
-        Binding {
-            if case .passwordRequired = model.phase { true } else { false }
-        } set: { _ in
-            // The sheet closes by answering it, which moves the model on from asking.
-        }
-    }
-
-    private func submitPassword() {
-        actions.unlock(password: password)
-        password = ""
-    }
-
-    private func openDropped(_ urls: [URL]) -> Bool {
-        let pdfs = urls.filter { $0.pathExtension.lowercased() == "pdf" }
-        actions.open(pdfs)
-        return !pdfs.isEmpty
     }
 }
 
@@ -136,6 +81,7 @@ private struct StatusBar: View {
             Spacer()
             Text(model.statusMessage)
         }
+        .lineLimit(1)
         .font(.callout)
         .foregroundStyle(.secondary)
         .padding(.horizontal, 12)
@@ -162,5 +108,52 @@ private struct StatusBar: View {
         let pages = model.visibleTextPageCount
         let words = model.visibleText.split { $0.isWhitespace }.count
         return "\(pages) \(pages == 1 ? "page" : "pages") · \(words) words · \(model.textFormat.displayName)"
+    }
+}
+
+/// Asks for the password of a protected PDF, and opens the PDFs dropped on the window.
+struct DocumentOpening: ViewModifier {
+    let model: PluckModel
+    let actions: AppActions
+    @Binding var isDropTargeted: Bool
+    @State private var password = ""
+
+    func body(content: Content) -> some View {
+        content
+            .dropDestination(for: URL.self) { urls, _ in openDropped(urls) } isTargeted: { isDropTargeted = $0 }
+            .alert("Password Required", isPresented: isAskingForPassword) {
+                SecureField("Password", text: $password)
+                Button("Open", action: submitPassword)
+                Button("Cancel", role: .cancel) { password = "" }
+            } message: {
+                Text("“\(model.documentURL?.lastPathComponent ?? "This PDF")” is password-protected.")
+            }
+    }
+
+    private var isAskingForPassword: Binding<Bool> {
+        Binding {
+            if case .passwordRequired = model.phase { true } else { false }
+        } set: { _ in
+            // The sheet closes by answering it, which moves the model on from asking.
+        }
+    }
+
+    private func submitPassword() {
+        actions.unlock(password: password)
+        password = ""
+    }
+
+    private func openDropped(_ urls: [URL]) -> Bool {
+        let pdfs = urls.filter { $0.pathExtension.lowercased() == "pdf" }
+        actions.open(pdfs)
+        return !pdfs.isEmpty
+    }
+}
+
+extension ExtractedImage {
+    /// The line under an image in the grid: its pixel size and the page, or number of pages, it is on.
+    var caption: String {
+        let pages = pageIndexes.count == 1 ? "p. \((pageIndexes.first ?? 0) + 1)" : "\(pageIndexes.count) pages"
+        return "\(pixelWidth) × \(pixelHeight) · \(pages)"
     }
 }

@@ -25,7 +25,7 @@ public final class PDFPageThumbnailer: @unchecked Sendable {
             guard let context = CGContext.rgba(width: Int(size.width), height: Int(size.height), data: nil) else {
                 throw PluckError.renderingFailed(operation: "creating a canvas for page \(index + 1)")
             }
-            context.setFillColor(.white)
+            context.setFillColor(CGColor(gray: 1, alpha: 1))
             context.fill(CGRect(origin: .zero, size: size))
             context.scaleBy(x: size.width / pageSize.width, y: size.height / pageSize.height)
             // PDFKit moves the crop box to the origin and applies the page's rotation itself.

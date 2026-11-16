@@ -218,6 +218,41 @@ struct PluckModelTests {
         #expect(model.documentURL?.lastPathComponent == "Other.pdf")
     }
 
+    @Test("A tap adds a page or an image to the selection, and a second tap takes it away")
+    func tapSelection() async throws {
+        try await openSample()
+        let ids = model.visibleImages.map(\.id)
+
+        model.toggleSelection(ofPage: 0)
+        model.toggleSelection(ofPage: 2)
+        #expect(model.selectedPages == [0, 2])
+        model.toggleSelection(ofPage: 0)
+        #expect(model.selectedPages == [2])
+
+        model.selectedPages = []
+        model.toggleSelection(ofImage: ids[0])
+        model.toggleSelection(ofImage: ids[1])
+        #expect(model.selectedImageIDs == [ids[0], ids[1]])
+        model.toggleSelection(ofImage: ids[0])
+        #expect(model.selectedImageIDs == [ids[1]])
+    }
+
+    @Test("Select All takes the images shown, and a menu on an unselected image acts on it alone")
+    func selectAllAndMenuSelection() async throws {
+        try await openSample()
+        let ids = model.visibleImages.map(\.id)
+
+        model.selectedPages = [0]
+        model.selectAllVisibleImages()
+        #expect(model.selectedImageIDs == [ids[0], ids[1]])
+
+        model.selectForMenu(imageID: ids[1])
+        #expect(model.selectedImageIDs == [ids[0], ids[1]])
+        model.selectedPages = []
+        model.selectForMenu(imageID: ids[2])
+        #expect(model.selectedImageIDs == [ids[2]])
+    }
+
     @Test("Copying or exporting with nothing open is a harmless no-op")
     func nothingOpen() async throws {
         let urls = try await model.exportVisible(to: try TemporaryDirectory.make())

@@ -1,3 +1,4 @@
+#if os(macOS)
 import PluckKit
 import SwiftUI
 
@@ -89,3 +90,4 @@ struct PluckToolbar: ToolbarContent {
             .disabled(!hasSelection)
     }
 }
+#endif

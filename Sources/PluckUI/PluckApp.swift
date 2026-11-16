@@ -1,13 +1,18 @@
+#if os(macOS)
 import AppKit
 import PluckKit
 import TablesideShared
 import SwiftUI
 
-@main
-struct PluckApp: App {
+/// The Mac app: one window per PDF. `Sources/Pluck` starts it.
+public struct PluckApp: App {
     @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
 
-    var body: some Scene {
+    public init() {
+        // The scenes below hold all the state.
+    }
+
+    public var body: some Scene {
         // One window per PDF, as in Preview. Opening a PDF that already has a window brings it forward.
         WindowGroup(for: URL.self) { $url in
             DocumentWindow(url: url, router: appDelegate.router, recents: appDelegate.recents)
@@ -19,6 +24,7 @@ struct PluckApp: App {
             UpdateCommands(updater: .shared)
             #endif
             PluckCommands(router: appDelegate.router, recents: appDelegate.recents)
+            DocumentCommands()
         }
 
         Window("Open from Scrollkeeper", id: ScrollkeeperWindow.id) {
@@ -131,8 +137,4 @@ struct DocumentWindow: View {
         if model.phase == .ready, let url = model.documentURL { recents.note(url) }
     }
 }
-
-extension FocusedValues {
-    /// The commands of the frontmost document window, for the menu bar.
-    @Entry var documentActions: AppActions?
-}
+#endif

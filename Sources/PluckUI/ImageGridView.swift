@@ -1,6 +1,38 @@
+#if os(macOS)
 import AppKit
 import PluckKit
+import QuickLook
 import SwiftUI
+
+/// The Mac's image grid, with Quick Look on Space, as in Finder.
+struct ImageGrid: View {
+    @Bindable var model: PluckModel
+    let actions: AppActions
+    let thumbnailSize: Double
+
+    /// The selected images Quick Look shows, as temporary PNGs.
+    @State private var previewFile: URL?
+    @State private var previewFiles: [URL] = []
+
+    var body: some View {
+        ImageGridView(
+            images: model.visibleImages, transforms: model.transforms, selection: $model.selectedImageIDs,
+            thumbnailSize: thumbnailSize, actions: actions, onSpace: togglePreview)
+            .quickLookPreview($previewFile, in: previewFiles)
+    }
+
+    private func togglePreview() {
+        guard previewFile == nil else {
+            previewFile = nil
+            return
+        }
+        Task {
+            guard let files = try? await model.previewSelection(), let first = files.first else { return }
+            previewFiles = files
+            previewFile = first
+        }
+    }
+}
 
 /// What the grid should currently display.
 struct ImageGridContent {
@@ -198,3 +230,4 @@ final class ImageGridMenu: NSObject {
 
     @objc private func applyEdit(_ sender: NSMenuItem) { actions.apply(Self.edits[sender.tag].edit) }
 }
+#endif

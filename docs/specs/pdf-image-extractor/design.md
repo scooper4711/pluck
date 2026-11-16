@@ -2,12 +2,13 @@
 
 ## Shape
 
-A Swift package with three targets:
+A Swift package with four targets (the iPad app built from them is in the `ipad-app` spec):
 
 | Target | Role |
 | --- | --- |
 | `PluckKit` | All logic: PDF scanning, image decoding, de-duplication, edits, WebP/PNG encoding, export, pasteboard, and the observable `PluckModel`. |
-| `Pluck` | Thin SwiftUI/AppKit shell: split view, page sidebar, image grid, menus, panels. |
+| `PluckUI` | Thin SwiftUI/AppKit shell: split view, page sidebar, image grid, menus, panels. |
+| `Pluck` | The Mac entry point, which starts `PluckUI`'s app. |
 | `PluckKitTests` | Swift Testing suite driving `PluckKit` against PDFs it writes by hand. |
 
 `scripts/build-app.sh` builds the release binary and assembles `build/Pluck.app`, signed with

@@ -1,3 +1,4 @@
+#if os(macOS)
 import AppKit
 import PluckKit
 import UniformTypeIdentifiers
@@ -82,3 +83,4 @@ private extension Result {
         if case .failure(let error) = self { error } else { nil }
     }
 }
+#endif

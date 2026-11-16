@@ -1,5 +1,13 @@
-import AppKit
 import PDFKit
+#if os(macOS)
+import AppKit
+
+private typealias PlatformFont = NSFont
+#else
+import UIKit
+
+private typealias PlatformFont = UIFont
+#endif
 
 /// Reads what has been typed into a page's form fields. PDFKit leaves these values out of the
 /// page's text because annotations draw them, not the page itself. Each value is laid out the
@@ -10,7 +18,7 @@ struct FormFieldReader {
     /// A line of text takes about this many times the font size, as in PDFKit's character boxes.
     private static let lineHeightFactor: CGFloat = 1.2
     /// PDFKit's own choice for a field that names no font or asks for automatic sizing.
-    private static let defaultFont = NSFont(name: "Helvetica", size: 12) ?? .systemFont(ofSize: 12)
+    private static let defaultFont = PlatformFont(name: "Helvetica", size: 12) ?? .systemFont(ofSize: 12)
     /// Annotation flags (ISO 32000 table 165): Hidden (bit 2) and NoView (bit 6).
     private static let hiddenFlags = 1 << 1 | 1 << 5
 
@@ -48,7 +56,7 @@ struct FormFieldReader {
         }
     }
 
-    private func lines(of field: PDFAnnotation, font: NSFont) -> [String] {
+    private func lines(of field: PDFAnnotation, font: PlatformFont) -> [String] {
         let value = field.widgetStringValue ?? ""
         guard field.isMultiline else { return [value.replacingOccurrences(of: "\n", with: " ")] }
         let available = field.bounds.width - Self.padding * 2
@@ -58,7 +66,7 @@ struct FormFieldReader {
     }
 
     /// Breaks a paragraph between words so that each line fits the width, as a viewer would.
-    private static func wrap(_ paragraph: String, toWidth available: CGFloat, in font: NSFont) -> [String] {
+    private static func wrap(_ paragraph: String, toWidth available: CGFloat, in font: PlatformFont) -> [String] {
         var lines: [String] = []
         var line = ""
         for word in paragraph.split(separator: " ", omittingEmptySubsequences: true) {
@@ -82,14 +90,17 @@ struct FormFieldReader {
         }
     }
 
-    private static func width(of text: String, in font: NSFont) -> CGFloat {
+    private static func width(of text: String, in font: PlatformFont) -> CGFloat {
         (text as NSString).size(withAttributes: [.font: font]).width
     }
 
-    private static func style(of font: NSFont) -> CharacterStyle {
+    private static func style(of font: PlatformFont) -> CharacterStyle {
         let traits = font.fontDescriptor.symbolicTraits
-        return CharacterStyle(
-            fontName: font.fontName, size: font.pointSize,
-            isBold: traits.contains(.bold), isItalic: traits.contains(.italic))
+        #if os(macOS)
+        let (isBold, isItalic) = (traits.contains(.bold), traits.contains(.italic))
+        #else
+        let (isBold, isItalic) = (traits.contains(.traitBold), traits.contains(.traitItalic))
+        #endif
+        return CharacterStyle(fontName: font.fontName, size: font.pointSize, isBold: isBold, isItalic: isItalic)
     }
 }

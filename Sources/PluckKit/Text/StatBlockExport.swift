@@ -1,5 +1,10 @@
-import AppKit
+import Foundation
 import UniformTypeIdentifiers
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 /// Stat blocks on the pasteboard and in drags, for apps such as Turnkeeper that turn them into creatures.
 ///
@@ -41,13 +46,22 @@ public enum StatBlockExport {
     }
 
     /// Replaces the pasteboard's contents with the blocks, as stat block data, HTML and plain text.
-    public static func write(_ blocks: [StatBlock], to pasteboard: NSPasteboard) throws {
+    public static func write(_ blocks: [StatBlock], to pasteboard: SystemPasteboard) throws {
         let data = try data(for: blocks)
+        #if os(macOS)
         pasteboard.clearContents()
         pasteboard.declareTypes([NSPasteboard.PasteboardType(typeIdentifier), .html, .string], owner: nil)
         pasteboard.setData(data, forType: NSPasteboard.PasteboardType(typeIdentifier))
         pasteboard.setString(html(for: blocks), forType: .html)
         pasteboard.setString(plainText(for: blocks), forType: .string)
+        #else
+        // One item in three forms; an app pasting takes the richest it understands.
+        pasteboard.items = [[
+            typeIdentifier: data,
+            UTType.html.identifier: Data(html(for: blocks).utf8),
+            UTType.utf8PlainText.identifier: plainText(for: blocks)
+        ]]
+        #endif
     }
 
     /// A drag of the blocks, offering the stat block data, HTML and plain text.

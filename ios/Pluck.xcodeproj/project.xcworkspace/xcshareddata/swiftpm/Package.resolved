@@ -1,0 +1,24 @@
+{
+  "originHash" : "1dbe4b972939e779355ad62c1743b8f142cc3f79e6bae073f7608573123a4a5b",
+  "pins" : [
+    {
+      "identity" : "libwebp-xcode",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/libwebp-Xcode.git",
+      "state" : {
+        "revision" : "2b5256c29ff4e20f2a0d5ee863b62b1a22144434",
+        "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "tabletop-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/scooper4711/tabletop-kit.git",
+      "state" : {
+        "revision" : "5870ad2581766559a305f8fb5bd60ae27b33e9dc",
+        "version" : "1.3.0"
+      }
+    }
+  ],
+  "version" : 3
+}

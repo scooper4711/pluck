@@ -3,10 +3,12 @@ import PackageDescription
 
 let package = Package(
     name: "Pluck",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS(.v15), .iOS(.v18)],
     products: [
         .executable(name: "Pluck", targets: ["Pluck"]),
-        .library(name: "PluckKit", targets: ["PluckKit"])
+        .library(name: "PluckKit", targets: ["PluckKit"]),
+        // The app shared by the Mac executable and the iPad project in ios/.
+        .library(name: "PluckUI", targets: ["PluckUI"])
     ],
     dependencies: [
         .package(url: "https://github.com/SDWebImage/libwebp-Xcode.git", from: "1.5.0"),
@@ -20,13 +22,14 @@ let package = Package(
                 .product(name: "TablesideShared", package: "tabletop-kit")
             ]
         ),
-        .executableTarget(
-            name: "Pluck",
+        .target(
+            name: "PluckUI",
             dependencies: [
                 "PluckKit", .product(name: "AppNotices", package: "tabletop-kit"),
                 .product(name: "TablesideShared", package: "tabletop-kit")
             ]
         ),
+        .executableTarget(name: "Pluck", dependencies: ["PluckUI"]),
         .testTarget(
             name: "PluckKitTests",
             dependencies: [
