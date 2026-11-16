@@ -74,8 +74,11 @@ image inside it for copying, dragging out, or exporting as WebP.
 - R7.4 Pluck › Check for Updates… checks at any time and always reports the
   result. A newer version is downloaded to the Downloads folder only when the
   user agrees.
-- R7.5 Pluck › About Pluck credits the libraries built into the app with their
-  licenses: libwebp's copyright notice and BSD license in full.
+- R7.5 Pluck › About Pluck shows the notice Paizo's Community Use Policy
+  prescribes, word for word with only the app's name filled in, the line
+  "Pathfinder and Starfinder are registered trademarks and copyrights of Paizo
+  Inc." and where to reach the author, then credits the libraries built into the
+  app with their licenses: libwebp's copyright notice and BSD license in full.
 - R7.6 The app runs in the App Sandbox, without a paid Apple developer account.
   It reads and writes only the files and folders the user opens, drops, saves
   to or exports into, plus the Downloads folder for updates. Its first
