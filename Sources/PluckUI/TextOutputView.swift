@@ -1,5 +1,7 @@
-import AppKit
 import SwiftUI
+
+#if os(macOS)
+import AppKit
 
 /// The text mode's main view: the extracted text in the chosen format, selectable and searchable,
 /// with each paragraph on one (soft-wrapped) line.
@@ -27,3 +29,29 @@ struct TextOutputView: NSViewRepresentable {
         textView.string = text
     }
 }
+#else
+import UIKit
+
+/// The text mode's main view on the iPad: the extracted text in the chosen format, selectable and searchable
+/// (⌘F with a keyboard), with each paragraph on one (soft-wrapped) line.
+struct TextOutputView: UIViewRepresentable {
+    let text: String
+
+    func makeUIView(context _: Context) -> UITextView {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.isFindInteractionEnabled = true
+        textView.font = .preferredFont(forTextStyle: .body)
+        textView.adjustsFontForContentSizeCategory = true
+        textView.textContainerInset = UIEdgeInsets(top: 16, left: 18, bottom: 16, right: 18)
+        textView.backgroundColor = .clear
+        return textView
+    }
+
+    func updateUIView(_ textView: UITextView, context _: Context) {
+        guard textView.text != text else { return }
+        textView.text = text
+    }
+}
+#endif

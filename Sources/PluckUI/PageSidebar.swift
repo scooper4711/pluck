@@ -40,16 +40,7 @@ struct PageSidebar: View {
     }
 
     private var pageList: some View {
-        List(selection: $model.selectedPages) {
-            ForEach(0..<model.pageCount, id: \.self) { pageIndex in
-                PageRow(model: model, pageIndex: pageIndex, thumbnailPixels: thumbnailPixels)
-                    .overlay {
-                        if highlightedPage == pageIndex {
-                            RoundedRectangle(cornerRadius: 6).stroke(Color.accentColor, lineWidth: 2)
-                        }
-                    }
-            }
-        }
+        pages
         .onGeometryChange(for: Int.self) { proxy in
             Self.thumbnailPixels(forWidth: proxy.size.width)
         } action: { pixels in
@@ -58,7 +49,9 @@ struct PageSidebar: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !model.selectedPages.isEmpty {
                 Button("Show All Pages") { model.selectedPages = [] }
+                    #if os(macOS)
                     .buttonStyle(.link)
+                    #endif
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(.bar)
@@ -68,6 +61,39 @@ struct PageSidebar: View {
 }
 
 extension PageSidebar {
+    #if os(macOS)
+    private var pages: some View {
+        List(selection: $model.selectedPages) {
+            ForEach(0..<model.pageCount, id: \.self, content: row)
+        }
+    }
+    #else
+    /// A list selects several rows by touch only in edit mode, so on the iPad a tap adds a page to the
+    /// selection or takes it away.
+    private var pages: some View {
+        List {
+            ForEach(0..<model.pageCount, id: \.self) { pageIndex in
+                let isSelected = model.selectedPages.contains(pageIndex)
+                row(pageIndex)
+                    .contentShape(Rectangle())
+                    .onTapGesture { model.toggleSelection(ofPage: pageIndex) }
+                    .listRowBackground(isSelected ? Color.accentColor.opacity(0.25) : Color.clear)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+            }
+        }
+    }
+    #endif
+
+    private func row(_ pageIndex: Int) -> some View {
+        PageRow(model: model, pageIndex: pageIndex, thumbnailPixels: thumbnailPixels)
+            .overlay {
+                if highlightedPage == pageIndex {
+                    RoundedRectangle(cornerRadius: 6).stroke(Color.accentColor, lineWidth: 2)
+                }
+            }
+    }
+
     private static let pixelStep = 400.0
 
     /// Enough pixels for a portrait page filling the sidebar on a Retina display.

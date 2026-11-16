@@ -3,7 +3,8 @@ import WebKit
 
 /// The text mode's view for HTML: the markup rendered as a page. Copying a selection puts the
 /// markup of that selection on the pasteboard, not the rendered text.
-struct HTMLPreviewView: NSViewRepresentable {
+@MainActor
+struct HTMLPreviewView {
     /// The HTML to show: block elements only, with no `<html>` or `<body>` wrapper.
     let markup: String
 
@@ -11,16 +12,11 @@ struct HTMLPreviewView: NSViewRepresentable {
         Coordinator()
     }
 
-    func makeNSView(context: Context) -> WKWebView {
+    private func makeWebView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
-        webView.allowsMagnification = true
         webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
         return webView
-    }
-
-    func updateNSView(_: WKWebView, context: Context) {
-        context.coordinator.show(markup)
     }
 
     @MainActor
@@ -54,6 +50,30 @@ struct HTMLPreviewView: NSViewRepresentable {
         }
     }
 }
+
+#if os(macOS)
+extension HTMLPreviewView: NSViewRepresentable {
+    func makeNSView(context: Context) -> WKWebView {
+        let webView = makeWebView(context: context)
+        webView.allowsMagnification = true
+        return webView
+    }
+
+    func updateNSView(_: WKWebView, context: Context) {
+        context.coordinator.show(markup)
+    }
+}
+#else
+extension HTMLPreviewView: UIViewRepresentable {
+    func makeUIView(context: Context) -> WKWebView {
+        makeWebView(context: context)
+    }
+
+    func updateUIView(_: WKWebView, context: Context) {
+        context.coordinator.show(markup)
+    }
+}
+#endif
 
 /// The page the preview wraps around the extracted markup. Its styling is for display only and
 /// is never part of what is copied or exported.

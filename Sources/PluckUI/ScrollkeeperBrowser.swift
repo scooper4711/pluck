@@ -1,13 +1,12 @@
 import SwiftUI
 import TablesideShared
 
-/// File ▸ Open from Scrollkeeper…: search the titles with a PDF the user owns and ask Scrollkeeper for one,
-/// which it downloads when needed and opens in Pluck.
-struct ScrollkeeperWindow: View {
-    static let id = "scrollkeeper"
-
+/// Open from Scrollkeeper…: search the titles with a PDF the user owns and ask Scrollkeeper for one, which it
+/// downloads when needed and opens in Pluck. The Mac shows it in a window of its own, the iPad in a sheet.
+struct ScrollkeeperBrowser: View {
     let bridge: ScrollkeeperBridge
-    @Environment(\.dismissWindow) private var dismissWindow
+    /// Closes the window or sheet.
+    let close: () -> Void
     @Environment(\.openURL) private var openURL
     @State private var query = ""
     @State private var selection: ScrollkeeperIndex.Entry.ID?
@@ -20,18 +19,17 @@ struct ScrollkeeperWindow: View {
             HStack {
                 footnote
                 Spacer()
-                Button("Cancel", role: .cancel) { dismissWindow(id: Self.id) }
+                Button("Cancel", role: .cancel, action: close)
                     .keyboardShortcut(.cancelAction)
-                Button(selectedEntry?.downloaded == false ? "Download and Open" : "Open") { openSelection() }
+                Button(openTitle) { openSelection() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(selectedEntry == nil)
             }
         }
         .padding(20)
-        .frame(width: 560, height: 480)
         .onAppear(perform: bridge.requestIndex)
         .onChange(of: request?.phase) { _, phase in
-            if phase == .done { dismissWindow(id: Self.id) }
+            if phase == .done { close() }
         }
         .task(id: bridge.state) {
             isSlow = false
@@ -43,6 +41,12 @@ struct ScrollkeeperWindow: View {
 
     /// The title asked for; Pluck asks for one at a time.
     private var request: ScrollkeeperRequest? { bridge.requests.values.first }
+
+    /// Download and Open for a title not on disk, or where Scrollkeeper takes no requests, a way to it.
+    private var openTitle: String {
+        guard selectedEntry?.downloaded == false else { return "Open" }
+        return bridge.takesRequests ? "Download and Open" : "Download in Scrollkeeper"
+    }
 
     private var loadedIndex: ScrollkeeperIndex? {
         if case let .loaded(index) = bridge.state { index } else { nil }
@@ -146,7 +150,8 @@ struct ScrollkeeperWindow: View {
             if !entry.downloaded {
                 Image(systemName: "icloud.and.arrow.down")
                     .foregroundStyle(.secondary)
-                    .help("Not downloaded yet; Scrollkeeper downloads it first.")
+                    .help(bridge.takesRequests ? "Not downloaded yet; Scrollkeeper downloads it first."
+                          : "Not downloaded yet; download it in Scrollkeeper.")
             }
         }
     }
@@ -190,6 +195,6 @@ struct ScrollkeeperWindow: View {
     private func openSelection() {
         guard let entry = selectedEntry else { return }
         bridge.open(entry)
-        if entry.downloaded { dismissWindow(id: Self.id) }
+        if entry.downloaded { close() }
     }
 }

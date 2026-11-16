@@ -1,3 +1,4 @@
+#if os(macOS)
 import AppKit
 import PluckKit
 
@@ -82,19 +83,12 @@ final class ImageGridItem: NSCollectionViewItem {
 
     func show(_ image: ExtractedImage, transform: ImageTransform) {
         guard shown?.id != image.id || shown?.transform != transform else {
-            caption.stringValue = Self.caption(for: image)
+            caption.stringValue = image.caption
             return
         }
         shown = (image.id, transform)
         thumbnailView.image = (try? transform.apply(to: image.thumbnail)) ?? image.thumbnail
-        caption.stringValue = Self.caption(for: image)
-    }
-
-    private static func caption(for image: ExtractedImage) -> String {
-        let pages = image.pageIndexes.count == 1
-            ? "p. \((image.pageIndexes.first ?? 0) + 1)"
-            : "\(image.pageIndexes.count) pages"
-        return "\(image.pixelWidth) × \(image.pixelHeight) · \(pages)"
+        caption.stringValue = image.caption
     }
 }
 
@@ -161,3 +155,4 @@ private final class ThumbnailView: NSView {
         }
     }
 }
+#endif

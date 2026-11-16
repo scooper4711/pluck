@@ -1,3 +1,4 @@
+#if os(macOS)
 import AppKit
 import PluckKit
 import UniformTypeIdentifiers
@@ -100,3 +101,4 @@ enum DocumentPanel {
         return panel.runModal() == .OK ? panel.urls : []
     }
 }
+#endif
