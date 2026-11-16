@@ -2,8 +2,10 @@
 .swiftpm/
 build/
 tmp/
-*.xcodeproj
 xcuserdata/
 DerivedData/
 .DS_Store
 coverage/
+ios/build/
+ios/Local.xcconfig
+ios/Version.xcconfig

@@ -1,0 +1,22 @@
+// Signing and version settings for the iPad app.
+//
+// The team is the individual Apple Developer Program team that publishes Pluck, so archives build
+// anywhere, CI included. To build with your own team, put it in Local.xcconfig next to this file, which is not
+// committed:
+//
+//     DEVELOPMENT_TEAM = ABCDE12345
+//
+// If Xcode reports that the bundle identifier is taken, set your own there as well:
+//
+//     PRODUCT_BUNDLE_IDENTIFIER = com.example.Pluck
+DEVELOPMENT_TEAM = 9SWRBY8HN9
+PRODUCT_BUNDLE_IDENTIFIER = io.github.scooper4711.Pluck
+
+// The version and build number come from git (scripts/version.sh): the Pluck-iPad scheme's build pre-action
+// writes them to Version.xcconfig before every build, Product > Archive included. These are the fallbacks for a
+// build that skips the scheme.
+MARKETING_VERSION = 0.0.0
+CURRENT_PROJECT_VERSION = 1
+#include? "Version.xcconfig"
+
+#include? "Local.xcconfig"

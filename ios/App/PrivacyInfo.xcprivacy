@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Pluck's privacy manifest (scripts/build-app.sh copies it into Contents/Resources), for both channels. No
-     tracking and no data collected. @AppStorage keeps the export and text options in user defaults, for the app's
+<!-- Pluck's privacy manifest, for the iPad app (ios/App is a synchronized folder) and the Mac app
+     (scripts/build-app.sh copies it into Contents/Resources), for both of its channels. No tracking and no data
+     collected. @AppStorage keeps the export and text options in user defaults, for the app's
      own use (CA92.1). Pluck reads no file timestamps, boot times or disk space. -->
 <plist version="1.0">
 <dict>

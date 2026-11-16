@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Keys Xcode can't generate, merged into the Info.plist it writes (GENERATE_INFOPLIST_FILE). -->
+<plist version="1.0">
+<dict>
+    <!-- PDFs open in Pluck from Files and the share sheet, read where they are. -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>PDF Document</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.adobe.pdf</string>
+            </array>
+        </dict>
+    </array>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <!-- Lets Pluck see whether Scrollkeeper is installed and bring it forward to download a title. -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>scrollkeeper</string>
+    </array>
+    <!-- The stat blocks Pluck copies and drags, which Turnkeeper reads, as in the Mac app's Info.plist. -->
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.json</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Pathfinder Stat Block</string>
+            <key>UTTypeIdentifier</key>
+            <string>io.github.scooper4711.pluck.statblock</string>
+        </dict>
+    </array>
+</dict>
+</plist>
