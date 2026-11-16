@@ -18,6 +18,9 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
+        with:
+          # scripts/version.sh counts every commit for the build number.
+          fetch-depth: 0
 
       - name: Show toolchain
         run: swift --version

@@ -3,18 +3,19 @@
 #
 # Usage: scripts/build-app.sh [--install]   (--install moves it to /Applications)
 #
-# VERSION    version written to the bundle (default 0.0.0)
+# VERSION    version written to the bundle (default: scripts/version.sh marketing)
 # UNIVERSAL  set to 1 to build for both Apple silicon and Intel
 # TEAM_ID    the team that owns the App Group (default: read from the Developer ID certificate)
 # SIGNING_IDENTITY  passed to scripts/sign-app.sh; "-" signs ad hoc, without the App Group
-# BUILD_NUMBER  CFBundleVersion, which must increase with every App Store upload (default: VERSION)
+# BUILD_NUMBER  CFBundleVersion, which must increase with every App Store upload (default: scripts/version.sh build)
 # CHANNEL    "appstore" builds the Mac App Store package, build/appstore/Pluck.pkg, from the same sources, compiled
 #            with -DAPP_STORE so the updater is left out; needs TEAM_ID and the variables of tabletop-kit's
 #            scripts/package-appstore.sh (PACKAGER names another copy; TRIAL=1 checks it without them)
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-VERSION="${VERSION:-0.0.0}"
+VERSION="${VERSION:-$(scripts/version.sh marketing)}"
+BUILD_NUMBER="${BUILD_NUMBER:-$(scripts/version.sh build)}"
 APP="build/Pluck.app"
 EXECUTABLE="Pluck"
 
@@ -42,7 +43,7 @@ cp Resources/Credits.html "$APP/Contents/Resources/Credits.html"
 cp Resources/container-migration.plist "$APP/Contents/Resources/container-migration.plist"
 cp ios/App/PrivacyInfo.xcprivacy "$APP/Contents/Resources/PrivacyInfo.xcprivacy"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" \
-    -c "Set :CFBundleVersion ${BUILD_NUMBER:-$VERSION}" "$APP/Contents/Info.plist"
+    -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP/Contents/Info.plist"
 # The entitlements turn on the App Sandbox. A build signed with the team's Developer ID also joins the Tableside
 # Toolkit's App Group, where Scrollkeeper shares its library: the team's ID takes the place of TEAM_ID. The team ID
 # is read from the signing certificate, or from TEAM_ID in the environment. An ad hoc
@@ -63,7 +64,7 @@ if [[ "${CHANNEL:-}" == "appstore" ]]; then
     /usr/libexec/PlistBuddy -c "Delete :com.apple.security.files.downloads.read-write" "$ENTITLEMENTS"
 fi
 scripts/sign-app.sh "$APP" "$ENTITLEMENTS"
-echo "Built $APP ($VERSION)"
+echo "Built $APP ($VERSION, build $BUILD_NUMBER)"
 
 if [[ "${CHANNEL:-}" == "appstore" ]]; then
     # The App Store build must not update itself (guideline 2.4.5(vii)).

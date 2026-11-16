@@ -11,8 +11,9 @@ tabletop-kit's `scripts/package-appstore.sh` (its `appstore-build` spec).
   updater (guideline 2.4.5(vii)).
 - R1.3 Its entitlements leave out the Downloads folder, which only the updater used. The network client entitlement
   stays because the WKWebView preview renders nothing in the sandbox without it.
-- R1.4 The build number (`BUILD_NUMBER`) is apart from the version and increases with every upload; the bundle
-  declares `ITSAppUsesNonExemptEncryption` as false, a copyright line and the real version.
+- R1.4 The build number (`BUILD_NUMBER`) is apart from the version: it is the number of commits on main
+  (scripts/version.sh), so it increases with every merge and every upload. The bundle declares
+  `ITSAppUsesNonExemptEncryption` as false, a copyright line and the real version.
 
 ## R2 Privacy
 - R2.1 A privacy manifest ships in the bundle: no tracking, no data collected, and user defaults (CA92.1).
