@@ -1,5 +1,6 @@
 // Draws Pluck's app icon: a picture being lifted off a page.
-// Usage: swift scripts/make-icon.swift <output.png>   (see scripts/make-icon.sh)
+// Usage: swift scripts/make-icon.swift [--full-bleed] <output.png>   (see scripts/make-icon.sh)
+// --full-bleed draws the iPad's icon: the tile fills the square, opaque, and the system rounds the corners.
 import AppKit
 import CoreGraphics
 import ImageIO
@@ -40,8 +41,10 @@ func fillGradient(_ context: CGContext, in path: CGPath, top: UInt32, bottom: UI
     context.restoreGState()
 }
 
-func drawBackground(_ context: CGContext) {
-    let tile = roundedRect(CGRect(x: 100, y: 100, width: 824, height: 824), radius: 185)
+let tileFrame = CGRect(x: 100, y: 100, width: 824, height: 824)
+
+func drawBackground(_ context: CGContext, cornerRadius: CGFloat) {
+    let tile = roundedRect(tileFrame, radius: cornerRadius)
     context.saveGState()
     context.setShadow(offset: CGSize(width: 0, height: -12), blur: 28, color: color(0x000000, alpha: 0.35))
     context.addPath(tile)
@@ -121,11 +124,20 @@ func writePNG(_ image: CGImage, to path: String) {
     guard CGImageDestinationFinalize(destination) else { fatalError("Writing the icon failed: \(path)") }
 }
 
-guard CommandLine.arguments.count == 2 else { fatalError("Usage: make-icon.swift <output.png>") }
+let fullBleed = CommandLine.arguments.contains("--full-bleed")
+let outputPath = CommandLine.arguments.dropFirst().filter { $0 != "--full-bleed" }
+guard outputPath.count == 1 else { fatalError("Usage: make-icon.swift [--full-bleed] <output.png>") }
+// App Store Connect rejects an iOS icon with an alpha channel, so the full-bleed icon is drawn opaque.
+let alpha = fullBleed ? CGImageAlphaInfo.noneSkipLast : CGImageAlphaInfo.premultipliedLast
 let context = CGContext(
     data: nil, width: Int(canvasSize), height: Int(canvasSize), bitsPerComponent: 8, bytesPerRow: 0,
-    space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-drawBackground(context)
+    space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: alpha.rawValue)!
+if fullBleed {
+    // The tile's square fills the canvas.
+    context.scaleBy(x: canvasSize / tileFrame.width, y: canvasSize / tileFrame.height)
+    context.translateBy(x: -tileFrame.minX, y: -tileFrame.minY)
+}
+drawBackground(context, cornerRadius: fullBleed ? 0 : 185)
 drawPage(context)
 drawPicture(context)
-writePNG(context.makeImage()!, to: CommandLine.arguments[1])
+writePNG(context.makeImage()!, to: outputPath[0])

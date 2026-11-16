@@ -1,5 +1,5 @@
 #!/bin/bash
-# Regenerates Resources/AppIcon.icns from scripts/make-icon.swift.
+# Regenerates Resources/AppIcon.icns and the iPad's icon from scripts/make-icon.swift.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -20,3 +20,7 @@ iconutil --convert icns --output Resources/AppIcon.icns "$iconset"
 cp "$work/icon-1024.png" Resources/AppIcon.png
 rm -rf "$work"
 echo "Wrote Resources/AppIcon.icns"
+
+IPAD_ICON=ios/App/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+swift scripts/make-icon.swift --full-bleed "$IPAD_ICON"
+echo "Wrote $IPAD_ICON"
