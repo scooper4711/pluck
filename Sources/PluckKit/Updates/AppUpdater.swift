@@ -1,4 +1,4 @@
-#if !APP_STORE
+#if !APP_STORE && os(macOS)
 import Foundation
 import Observation
 
