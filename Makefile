@@ -1,4 +1,5 @@
-.PHONY: build test lint coverage app run install dmg appstore icon ipad-install ipad-simulator ipad-uitests clean
+.PHONY: build test lint coverage app run install dmg appstore icon ipad-install ipad-simulator ipad-uitests \
+	iphone-simulator iphone-uitests clean
 
 build:
 	swift build
@@ -42,6 +43,13 @@ ipad-simulator:
 # Runs the iPad UI tests, which screenshot both orientations.
 ipad-uitests:
 	scripts/run-ipad-uitests.sh
+
+# The same app in an iPhone simulator, and its UI tests there.
+iphone-simulator:
+	SIMULATOR_FAMILY=iPhone scripts/run-ipad-simulator.sh
+
+iphone-uitests:
+	SIMULATOR_FAMILY=iPhone scripts/run-ipad-uitests.sh
 
 # Redraws Resources/AppIcon.icns and the iPad's icon from scripts/make-icon.swift.
 icon:

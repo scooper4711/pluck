@@ -1,13 +1,14 @@
 #!/bin/sh
 # Builds the iPad app for the simulator, installs it and starts it.
 #
-# IPAD_SIMULATOR  name of the simulator to use (default: an iPad on the newest iOS installed)
+# IPAD_SIMULATOR    name of the simulator to use (default: a SIMULATOR_FAMILY device on the newest iOS)
+# SIMULATOR_FAMILY  iPad (the default) or iPhone
 set -eu
 
 cd "$(dirname "$0")/.."
 
 DEVICE="$(scripts/ipad-simulator-id.sh)"
-[ -n "$DEVICE" ] || { echo "Starting the simulator failed: no iPad simulator is installed." >&2; exit 1; }
+[ -n "$DEVICE" ] || { echo "Starting the simulator failed: no ${SIMULATOR_FAMILY:-iPad} simulator is installed." >&2; exit 1; }
 
 # Unsigned, so it builds without a developer team; the App Group is then missing and Open from Scrollkeeper finds
 # no library.
