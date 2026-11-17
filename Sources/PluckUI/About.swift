@@ -7,7 +7,7 @@ extension AboutInfo {
     /// the Mac's About panel shows.
     static let pluck = AboutInfo(
         appName: "Pluck",
-        tagline: "An unofficial, free app that gets the art, text and stat blocks out of your PDFs.",
+        tagline: "A free app that gets the art, text and stat blocks out of your PDFs.",
         credits: ["WebP images are written with libwebp (chromium.googlesource.com/webm/libwebp), used under "
             + "its BSD license."],
         // A literal URL that is known to parse.
