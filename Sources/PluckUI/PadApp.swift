@@ -43,6 +43,9 @@ struct PadCommands: Commands {
                 .disabled(actions == nil)
             OpenRecentMenu(recents: recents) { actions?.open([$0]) }
                 .disabled(actions == nil)
+            Divider()
+            Button("Close") { actions?.close() }
+                .disabled(actions?.model.documentURL == nil)
         }
         CommandGroup(replacing: .help) {
             Link("Pluck Privacy Policy", destination: AppLinks.privacyPolicy)

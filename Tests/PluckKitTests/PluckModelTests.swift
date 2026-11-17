@@ -48,6 +48,20 @@ struct PluckModelTests {
         #expect(await model.pageThumbnail(at: 0)?.width == 320)
     }
 
+    @Test("Closing the PDF empties the window and forgets what was chosen in it")
+    func close() async throws {
+        try await openSample()
+        model.selectedPages = [0]
+        select(width: 2)
+
+        model.close()
+
+        #expect(model.phase == .empty && model.documentURL == nil)
+        #expect(model.pageCount == 0 && model.visibleImages.isEmpty)
+        #expect(model.selectedPages.isEmpty && model.selectedImageIDs.isEmpty)
+        #expect(await model.pageThumbnail(at: 0) == nil)
+    }
+
     @Test("Selecting pages narrows the images shown to those pages")
     func pageSelection() async throws {
         try await openSample()
