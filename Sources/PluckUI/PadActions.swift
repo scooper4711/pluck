@@ -54,8 +54,14 @@ final class PadPresenter {
     /// Keeps a PDF from Files or another app readable while it is shown: its pages are read as they are needed,
     /// not all at once. Access to the PDF shown before ends.
     func access(_ url: URL) {
-        accessedDocument?.stopAccessingSecurityScopedResource()
+        endAccess()
         accessedDocument = url.startAccessingSecurityScopedResource() ? url : nil
+    }
+
+    /// Ends access to the PDF shown, once it is closed.
+    func endAccess() {
+        accessedDocument?.stopAccessingSecurityScopedResource()
+        accessedDocument = nil
     }
 }
 
@@ -82,6 +88,12 @@ struct AppActions {
         presenter.isShowingScrollkeeper = false
         presenter.access(url)
         Task { await model.open(url) }
+    }
+
+    /// Closes the PDF, leaving the window empty.
+    func close() {
+        model.close()
+        presenter.endAccess()
     }
 
     /// Retries this window's password-protected PDF.

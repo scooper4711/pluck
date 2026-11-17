@@ -48,6 +48,16 @@ final class DocumentUITests: PluckUITestCase {
         XCTAssertTrue(status("3 images").waitForExistence(timeout: 20), app.debugDescription)
     }
 
+    func testClosingThePDFEmptiesTheWindow() {
+        launchWithSample()
+        app.buttons["Open"].tap()
+        app.buttons["Close"].tap()
+        XCTAssertTrue(app.staticTexts["Open a PDF"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertFalse(images.firstMatch.exists, "Images are still shown")
+        app.buttons["Open"].tap()
+        XCTAssertFalse(app.buttons["Close"].isEnabled, "Close is offered with no PDF open")
+    }
+
     func testCopyingARotatedImage() {
         launchWithSample()
         XCTAssertFalse(app.buttons["Copy"].isEnabled, "Copy is offered with nothing selected")

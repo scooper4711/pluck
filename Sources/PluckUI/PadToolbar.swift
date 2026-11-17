@@ -20,6 +20,9 @@ struct PluckToolbar: ToolbarContent {
                 Button("Open from Scrollkeeper…", systemImage: "books.vertical",
                        action: actions.openFromScrollkeeper)
                 OpenRecentMenu(recents: actions.recents) { actions.open([$0]) }
+                Divider()
+                Button("Close", systemImage: "xmark", action: actions.close)
+                    .disabled(model.documentURL == nil)
             }
         }
         ToolbarItem(placement: .principal) {

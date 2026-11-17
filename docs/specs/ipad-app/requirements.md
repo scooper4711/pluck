@@ -21,6 +21,9 @@ and how things leave the app.
   moved or deleted drops off it.
 - R1.6 A password-protected PDF prompts for its password, and a file that is
   not a readable PDF reports an error, as on the Mac.
+- R1.8 Close, in the toolbar's Open menu and the menu bar's File menu, closes
+  the PDF shown and returns the window to R1.1. It is unavailable when no PDF
+  is open.
 
 ## R2 Pages
 - R2.1 The sidebar lists every page with a thumbnail and its image count.
