@@ -51,6 +51,11 @@ security-scoped access and stops it for the PDF shown before. The PDF is read
 as its pages are needed, so access lasts while it is shown. Exporting images
 starts and stops access to the chosen folder around the export.
 
+## Closing a PDF
+`AppActions.close` calls `PluckModel.close`, which bumps the open generation so
+a scan under way stops, clears what `open` would reset, and goes back to the
+empty phase. `PadPresenter.endAccess` stops access to the PDF (R1.8).
+
 ## Sharing PDFs to Pluck
 `ios/Info.plist` lists PDF as a document type (viewer, alternate handler) with
 `LSSupportsOpeningDocumentsInPlace`, which puts Pluck in the share sheet for a
