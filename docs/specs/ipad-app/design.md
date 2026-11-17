@@ -9,8 +9,8 @@
 - `ios/Pluck.xcodeproj` (scheme `Pluck-iPad`) is the iPad app. Its only source
   is `ios/App/PluckMain.swift`; it links `PluckUI` from the local package.
   Signing, the version from git (`scripts/version.sh`) and the App Group
-  entitlement follow Mapsmith's `ios/` folder. `TARGETED_DEVICE_FAMILY` is the
-  iPad alone (R8.2).
+  entitlement follow Mapsmith's `ios/` folder. `TARGETED_DEVICE_FAMILY` is 1,2: the
+  iPad and the iPhone (R8.2).
 - `PluckKit` builds for both. `SystemPasteboard` is `NSPasteboard` or
   `UIPasteboard`; `PasteboardWriter` and `StatBlockExport` write to either, and
   `FormFieldReader` measures with `NSFont` or `UIFont`. The updater is compiled
@@ -108,3 +108,17 @@ not on disk.
   the selection changes.
 - With two Pluck windows side by side, each keeps its own PDF; a PDF shared to
   Pluck opens in the window the system chooses.
+
+## iPhone
+`PadContentView` reads the horizontal size class itself, outside the split
+view, since the columns are compact on the iPad too. The split view collapses
+on a compact window; `PadPresenter.compactColumn`, its
+`preferredCompactColumn`, starts on the detail so a PDF's images show first.
+The sidebar then has a Done button that sets it back to the detail, and Show
+Page in Sidebar sets it to the sidebar as well as showing the column.
+
+`PluckToolbar` takes `isCompact`: on a compact window the mode's commands go in
+a `.bottomBar` group instead of beside the More menu, which leaves the top bar
+Open, the switch and More. The UI tests run on an iPhone simulator with
+`make iphone-uitests`; the tests that need the sidebar beside the grid skip
+there, and `PhoneLayoutUITests` covers R9.
