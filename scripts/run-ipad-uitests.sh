@@ -2,14 +2,15 @@
 # Runs the iPad UI tests in a simulator. They screenshot the window in landscape and portrait; the screenshots are
 # kept in the test results (ios/build/Logs/Test).
 #
-# IPAD_SIMULATOR  name of the simulator to use (default: an iPad on the newest iOS installed)
-# ONLY            tests to run, space-separated, such as "LayoutUITests/testInspectorInLandscape"
+# IPAD_SIMULATOR    name of the simulator to use (default: a SIMULATOR_FAMILY device on the newest iOS)
+# SIMULATOR_FAMILY  iPad (the default) or iPhone
+# ONLY              tests to run, space-separated, such as "LayoutUITests/testInspectorInLandscape"
 set -eu
 
 cd "$(dirname "$0")/.."
 
 DEVICE="$(scripts/ipad-simulator-id.sh)"
-[ -n "$DEVICE" ] || { echo "Running the UI tests failed: no iPad simulator is installed." >&2; exit 1; }
+[ -n "$DEVICE" ] || { echo "Running the UI tests failed: no ${SIMULATOR_FAMILY:-iPad} simulator is installed." >&2; exit 1; }
 echo "Running the UI tests on simulator $DEVICE..."
 
 set -- -project ios/Pluck.xcodeproj -scheme Pluck-iPad \

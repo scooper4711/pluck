@@ -96,7 +96,20 @@ and how things leave the app.
 
 ## R8 Layout and packaging
 - R8.1 The sidebar, grid, text and toolbar fit in landscape and portrait.
-- R8.2 The iPad app is for the iPad only; it is not offered for the iPhone.
+- R8.2 The same app runs on the iPhone (iOS 18 or later); see R9.
 - R8.3 The Mac app keeps working as before.
 - R8.4 The iPad app declares the same privacy manifest as the Mac app and
   collects nothing.
+
+## R9 iPhone
+- R9.1 On the iPhone, and in a narrow iPad window, the window shows one screen
+  at a time: the PDF's images or text first, and Back to the pages.
+- R9.2 Tapping pages selects them as on the iPad (R2.2); Done returns to the
+  images or text of the selected pages.
+- R9.3 Show Page in Sidebar goes back to the pages and scrolls to the page.
+- R9.4 The top bar holds Open, the Images/Text switch and the More menu. The
+  commands of the mode on show (rotate and flip, Copy, Quick Look and Export
+  for the images; Format, Copy All and Export for the text) are in a bar along
+  the bottom.
+- R9.5 The app turns to landscape, but not upside down. Sheets fit the phone's
+  width.

@@ -3,11 +3,13 @@ import PluckKit
 import SwiftUI
 
 /// The iPad's toolbar: Open at the leading edge, the Images/Text switch in the middle, and the commands of the
-/// mode on show at the trailing edge, with everything used less often in the More menu.
+/// mode on show at the trailing edge, with everything used less often in the More menu. A compact window, such as
+/// the iPhone's, has no room for them at the top, so the mode's commands go in a bar along the bottom.
 struct PluckToolbar: ToolbarContent {
     @Bindable var model: PluckModel
     let actions: AppActions
     @Binding var thumbnailSize: Double
+    let isCompact: Bool
 
     private var hasSelection: Bool { !model.selectedImages.isEmpty }
 
@@ -28,13 +30,19 @@ struct PluckToolbar: ToolbarContent {
             .pickerStyle(.segmented)
             .frame(minWidth: 180)
         }
-        ToolbarItemGroup(placement: .topBarTrailing) {
-            if model.mode == .images {
-                imageTools
-            } else {
-                textTools
-            }
+        ToolbarItemGroup(placement: isCompact ? .bottomBar : .topBarTrailing) {
+            modeTools
+        }
+        ToolbarItem(placement: .topBarTrailing) {
             moreMenu
+        }
+    }
+
+    @ViewBuilder private var modeTools: some View {
+        if model.mode == .images {
+            imageTools
+        } else {
+            textTools
         }
     }
 
