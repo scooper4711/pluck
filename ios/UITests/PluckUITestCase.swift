@@ -40,6 +40,12 @@ class PluckUITestCase: XCTestCase {
         app.buttons[item].tap()
     }
 
+    /// For a test that needs the pages beside the images, which an iPhone shows one at a time (PhoneLayoutUITests).
+    func skipOnPhone() throws {
+        try XCTSkipIf(UIDevice.current.userInterfaceIdiom == .phone,
+                      "The iPhone shows the pages on a screen of their own.")
+    }
+
     func keepScreenshot(_ name: String) {
         // Let a rotation finish first. The screen's screenshot, unlike the app's, isn't cropped to portrait.
         Thread.sleep(forTimeInterval: 1)

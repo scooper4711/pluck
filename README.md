@@ -5,7 +5,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=scooper4711_pluck&metric=coverage)](https://sonarcloud.io/summary/new_code?id=scooper4711_pluck)
 [![GitHub Release](https://img.shields.io/github/v/release/scooper4711/pluck)](https://github.com/scooper4711/pluck/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/scooper4711/pluck/total)](https://github.com/scooper4711/pluck/releases)
-[![Platform](https://img.shields.io/badge/platform-macOS%2015%2B%20%7C%20iPadOS%2018%2B-informational)](#requirements)
+[![Platform](https://img.shields.io/badge/platform-macOS%2015%2B%20%7C%20iPadOS%2018%2B%20%7C%20iOS%2018%2B-informational)](#requirements)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 <img src="Resources/AppIcon.png" width="128" alt="Pluck icon">
@@ -14,7 +14,7 @@ Have you wanted a creature's art from an adventure PDF, for a token or a custom 
 a PDF usually means a screenshot: the wrong size, a background where it should be transparent, and a page edge
 cutting it off.
 
-Pluck is a Mac and iPad app that opens a PDF and offers up every image inside it, and its text too. It reads the images
+Pluck is a Mac, iPad and iPhone app that opens a PDF and offers up every image inside it, and its text too. It reads the images
 the PDF actually contains, at their own resolution and with their transparency, so a creature's art comes out
 as the creature alone, ready for a token, a custom pawn in [Pawn Shop](https://github.com/scooper4711/pawn-shop)
 or a virtual tabletop.
@@ -65,9 +65,9 @@ is on. The art is public domain (see [Sample art](#sample-art)).*
 - **Updates:** Pluck tells you when a new version is released, if you like: it checks when it opens (turn that
   off in Settings) and on Pluck › Check for Updates….
 
-### On the iPad
+### On the iPad and iPhone
 
-The iPad app reads the same images, text and stat blocks. The differences:
+The iPad app, which runs on the iPhone too, reads the same images, text and stat blocks. The differences:
 
 - **Touch selection:** tap a page or an image to select it, tap again to deselect it. Touch and hold an image
   for its menu. Select All (⌘A with a keyboard) is in the toolbar's More menu.
@@ -78,10 +78,12 @@ The iPad app reads the same images, text and stat blocks. The differences:
 - **Open from Scrollkeeper** lists the library Scrollkeeper on the iPad shares, and opens the titles it has
   downloaded. Scrollkeeper on the iPad takes no requests, so download a title there first.
 - **No updater:** the iPad app is updated by installing a newer build.
+- **On the iPhone** the images or text come first, and Back goes to the pages; choose some and tap Done. The
+  commands for the images or the text are in a bar along the bottom.
 
 ## Requirements
 
-macOS 15 or later, or iPadOS 18 or later.
+macOS 15 or later, iPadOS 18 or later, or iOS 18 or later on the iPhone.
 
 ## Installing a release
 
@@ -133,10 +135,13 @@ make icon     # redraws Resources/AppIcon.icns and the iPad's icon
 make ipad-simulator # builds the iPad app and starts it in a simulator
 make ipad-install   # builds the iPad app and installs it on a connected iPad
 make ipad-uitests   # runs the iPad UI tests, which screenshot both orientations
+make iphone-simulator # the same app in an iPhone simulator
+make iphone-uitests   # the UI tests on an iPhone simulator
 ```
 
 The iPad app is `ios/Pluck.xcodeproj` (scheme `Pluck-iPad`). To build it with your own Apple developer team, put
-the team in `ios/Local.xcconfig` (see `ios/Signing.xcconfig`).
+the team in `ios/Local.xcconfig` (see `ios/Signing.xcconfig`). The same app runs on the iPhone: to install it on
+one, turn on Developer Mode there and run `IPAD=<the iPhone's name> make ipad-install`.
 
 Building needs Xcode 16 or later (Swift 6 toolchain). `scripts/sign-app.sh` signs the app with the Developer ID when
 the keychain holds a Developer ID Application certificate, and ad hoc otherwise. `swift run Pluck` runs it unbundled

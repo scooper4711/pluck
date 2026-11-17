@@ -59,7 +59,8 @@ final class DocumentUITests: PluckUITestCase {
         XCTAssertTrue(status("Copied 1 image").waitForExistence(timeout: 10), app.debugDescription)
     }
 
-    func testAnImagesMenuActsOnThatImage() {
+    func testAnImagesMenuActsOnThatImage() throws {
+        try skipOnPhone()
         launchWithSample()
         images.element(boundBy: 0).tap()
         images.element(boundBy: 2).press(forDuration: 1)
@@ -71,7 +72,8 @@ final class DocumentUITests: PluckUITestCase {
         XCTAssertTrue(status("3 images · 1 selected").exists, app.debugDescription)
     }
 
-    func testTappingPagesNarrowsTheImages() {
+    func testTappingPagesNarrowsTheImages() throws {
+        try skipOnPhone()
         launchWithSample()
         let secondPage = app.buttons["Page 2, 1 image"]
         XCTAssertTrue(secondPage.waitForExistence(timeout: 10), app.debugDescription)

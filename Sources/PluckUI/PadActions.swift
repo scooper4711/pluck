@@ -36,6 +36,8 @@ final class PadPresenter {
     private(set) var textFile: URL?
     var isSavingTextFile = false
     var columnVisibility = NavigationSplitViewVisibility.automatic
+    /// The column a collapsed split view shows, on the iPhone: the images or text first, Back to the pages.
+    var compactColumn = NavigationSplitViewColumn.detail
     /// The open PDF, while it is one the app may read only between starting and stopping access to it.
     @ObservationIgnored private var accessedDocument: URL?
 
@@ -117,9 +119,10 @@ struct AppActions {
         if !model.visibleImages.isEmpty { presenter.choose(.exportVisible) }
     }
 
-    /// Shows the page in the sidebar, which is hidden in portrait until asked for.
+    /// Shows the page in the sidebar, which is hidden in portrait, and on the iPhone a screen of its own.
     func revealPageOfSelectedImage() {
         presenter.columnVisibility = .all
+        presenter.compactColumn = .sidebar
         model.revealPageOfSelectedImage()
     }
 
