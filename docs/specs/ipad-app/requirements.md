@@ -69,9 +69,11 @@ and how things leave the app.
   as on the Mac.
 - R5.2 A title Scrollkeeper has downloaded opens straight from the shared
   folder. A title with several PDFs opens the last of them (R1.5).
-- R5.3 Scrollkeeper on the iPad takes no requests from other apps, so for a
-  title not downloaded yet the button says Download in Scrollkeeper and brings
-  Scrollkeeper forward.
+- R5.3 Scrollkeeper on the iPad can't send a title back, so for a title not
+  downloaded yet the button says Download in Scrollkeeper. It brings
+  Scrollkeeper forward with a download request for that title, which
+  Scrollkeeper shows and starts downloading (scrollkeeper app-handoff 2.9); back
+  in Pluck, the title opens from the shared library once it is on disk (R5.4).
 - R5.4 The list is read again when Pluck comes back to the foreground and when
   Scrollkeeper says its library changed.
 - R5.5 When there is no shared library (Scrollkeeper isn't installed or hasn't

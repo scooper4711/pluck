@@ -95,7 +95,10 @@ As in Mapsmith: `PadLauncher` takes no requests, checks for Scrollkeeper with
 `canOpenURL("scrollkeeper://")` (listed in `LSApplicationQueriesSchemes`) and
 opens it with `UIApplication.open`. The bridge then reads only the shared
 library, and `ScrollkeeperBrowser` says Download in Scrollkeeper for a title
-not on disk.
+not on disk. For that button the bridge calls `openInForeground` with
+`scrollkeeper://download?sku=…&app=pluck`, which `PadLauncher` opens with
+`UIApplication.open`; without it the protocol's default would open a bare
+`scrollkeeper://`, which only brings Scrollkeeper forward.
 
 ## Testing
 - Unit tests cover what was added to `PluckKit`: tap selection and the

@@ -128,7 +128,7 @@ struct PadRootView: View {
 }
 
 /// The system side of `ApplicationLauncher` on the iPad. Scrollkeeper there takes no requests in the background:
-/// Pluck reads its shared library and brings it forward to download a title.
+/// Pluck reads its shared library and brings Scrollkeeper forward with a request to download a title.
 struct PadLauncher: ApplicationLauncher {
     // A literal URL that is known to parse.
     // swiftlint:disable:next force_unwrapping
@@ -145,7 +145,12 @@ struct PadLauncher: ApplicationLauncher {
     }
 
     func openInBackground(_ url: URL) {
-        // Nothing is ever asked of Scrollkeeper on the iPad (`takesRequests`).
+        // Nothing is asked of Scrollkeeper in the background on the iPad (`takesRequests`).
+    }
+
+    /// A download request, which brings Scrollkeeper forward to show the title and start downloading it.
+    func openInForeground(_ url: URL) {
+        UIApplication.shared.open(url)
     }
 
     func launch(_ bundleIdentifier: String) {
