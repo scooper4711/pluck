@@ -15,7 +15,9 @@ concurrency:
 jobs:
   test:
     name: Lint, test and coverage
-    runs-on: macos-26
+    # The Mac mini runs our own builds; pull requests from forks stay on GitHub's machines, since this is a public
+    # repository and a self-hosted runner would run a stranger's code on the mini.
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'macos-26' || 'mac-mini' }}
     steps:
       - uses: actions/checkout@v7
         with:
