@@ -22,7 +22,7 @@ extension PluckModel {
     }
 
     /// Puts stat blocks on the pasteboard for apps such as Turnkeeper, and as plain text for the rest.
-    public func copyStatBlocks(_ blocks: [StatBlock], to pasteboard: SystemPasteboard = .general) {
+    public func copyStatBlocks(_ blocks: [StatBlock], to pasteboard: any Pasteboard = SystemPasteboard.general) {
         do {
             try StatBlockExport.write(blocks, to: pasteboard)
             statusMessage = blocks.count == 1

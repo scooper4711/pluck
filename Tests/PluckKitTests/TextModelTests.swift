@@ -75,14 +75,13 @@ struct TextModelTests {
     func copyAndExport() async throws {
         try await openSample()
         model.selectedPages = [0]
-        let pasteboard = NSPasteboard.withUniqueName()
-        defer { pasteboard.releaseGlobally() }
+        let pasteboard = MemoryPasteboard()
 
         model.copyText(to: pasteboard)
         let url = try TemporaryDirectory.make().appendingPathComponent(model.textFileName)
         try model.exportText(to: url)
 
-        #expect(pasteboard.string(forType: .string) == model.visibleText)
+        #expect(pasteboard.text("public.utf8-plain-text") == model.visibleText)
         #expect(try String(contentsOf: url, encoding: .utf8) == model.visibleText)
         #expect(model.statusMessage == "Exported text to “Scenario.md”")
     }

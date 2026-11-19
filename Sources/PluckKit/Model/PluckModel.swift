@@ -177,7 +177,7 @@ public final class PluckModel {
         try await export(visibleImages, to: directory)
     }
 
-    public func copySelection(to pasteboard: SystemPasteboard = .general) async throws {
+    public func copySelection(to pasteboard: any Pasteboard = SystemPasteboard.general) async throws {
         let requests = try selectedImages.map { try renderRequest(for: $0) }
         let encoded = try await Task.detached { try PasteboardWriter.encode(requests) }.value
         PasteboardWriter.write(encoded, to: pasteboard)
@@ -185,7 +185,7 @@ public final class PluckModel {
     }
 
     /// Puts the shown text on the pasteboard as a plain string in the chosen format.
-    public func copyText(to pasteboard: SystemPasteboard = .general) {
+    public func copyText(to pasteboard: any Pasteboard = SystemPasteboard.general) {
         PasteboardWriter.write(visibleText, to: pasteboard)
         statusMessage = "Copied text of \(Self.count(visibleTextPageCount, "page"))"
     }
