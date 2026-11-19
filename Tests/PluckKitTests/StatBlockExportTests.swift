@@ -22,15 +22,16 @@ struct StatBlockExportTests {
         #expect(json?["format"] as? Int == 1)
     }
 
-    @Test("The pasteboard gets the stat block type, HTML and plain text")
+    @Test("The pasteboard gets one item: the stat block type, HTML and plain text")
+    @MainActor
     func pasteboard() throws {
-        let pasteboard = NSPasteboard(name: NSPasteboard.Name("PluckTests-\(UUID().uuidString)"))
-        defer { pasteboard.releaseGlobally() }
+        let pasteboard = MemoryPasteboard()
         try StatBlockExport.write([block], to: pasteboard)
-        let data = try #require(pasteboard.data(forType: NSPasteboard.PasteboardType(StatBlockExport.typeIdentifier)))
+        #expect(pasteboard.items.count == 1)
+        let data = try #require(pasteboard.data(StatBlockExport.typeIdentifier))
         #expect(try StatBlockExport.blocks(from: data).first?.displayName == "Gwibble (1-2)")
-        #expect(pasteboard.string(forType: .html) == StatBlockExport.html(for: [block]))
-        #expect(pasteboard.string(forType: .string)?.hasPrefix("Gwibble (1-2) — Creature 1") == true)
+        #expect(pasteboard.text("public.html") == StatBlockExport.html(for: [block]))
+        #expect(pasteboard.text("public.utf8-plain-text")?.hasPrefix("Gwibble (1-2) — Creature 1") == true)
     }
 
     @Test("The HTML has a heading, the traits on one line, and bold labels, with a rule between sections")
@@ -78,8 +79,7 @@ struct StatBlockExportTests {
     @Test("Copying reports what was copied")
     @MainActor
     func copyStatus() throws {
-        let pasteboard = NSPasteboard(name: NSPasteboard.Name("PluckTests-\(UUID().uuidString)"))
-        defer { pasteboard.releaseGlobally() }
+        let pasteboard = MemoryPasteboard()
         let model = PluckModel(defaults: try #require(UserDefaults(suiteName: "PluckTests-\(UUID().uuidString)")))
         model.copyStatBlocks([block], to: pasteboard)
         #expect(model.statusMessage == "Copied the stat block for Gwibble (1-2)")

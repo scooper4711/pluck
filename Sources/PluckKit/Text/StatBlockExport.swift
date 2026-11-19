@@ -45,23 +45,14 @@ public enum StatBlockExport {
         return (["<meta charset=\"utf-8\">"] + body).joined(separator: "\n")
     }
 
-    /// Replaces the pasteboard's contents with the blocks, as stat block data, HTML and plain text.
-    public static func write(_ blocks: [StatBlock], to pasteboard: SystemPasteboard) throws {
-        let data = try data(for: blocks)
-        #if os(macOS)
-        pasteboard.clearContents()
-        pasteboard.declareTypes([NSPasteboard.PasteboardType(typeIdentifier), .html, .string], owner: nil)
-        pasteboard.setData(data, forType: NSPasteboard.PasteboardType(typeIdentifier))
-        pasteboard.setString(html(for: blocks), forType: .html)
-        pasteboard.setString(plainText(for: blocks), forType: .string)
-        #else
-        // One item in three forms; an app pasting takes the richest it understands.
-        pasteboard.items = [[
-            typeIdentifier: data,
-            UTType.html.identifier: Data(html(for: blocks).utf8),
-            UTType.utf8PlainText.identifier: plainText(for: blocks)
-        ]]
-        #endif
+    /// Replaces the pasteboard's contents with the blocks: one item as stat block data, HTML and plain text.
+    @MainActor
+    public static func write(_ blocks: [StatBlock], to pasteboard: any Pasteboard) throws {
+        pasteboard.replaceContents(with: [[
+            typeIdentifier: .data(try data(for: blocks)),
+            UTType.html.identifier: .text(html(for: blocks)),
+            UTType.utf8PlainText.identifier: .text(plainText(for: blocks))
+        ]])
     }
 
     /// A drag of the blocks, offering the stat block data, HTML and plain text.

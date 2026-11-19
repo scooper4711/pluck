@@ -23,19 +23,10 @@ public struct PasteboardImage: Sendable {
         tiff = try TIFFEncoder.encode(image)
     }
 
-    #if os(macOS)
-    var pasteboardItem: NSPasteboardItem {
-        let item = NSPasteboardItem()
-        item.setData(png, forType: .png)
-        item.setData(tiff, forType: .tiff)
-        return item
+    /// The image as one pasteboard item, in both forms.
+    var pasteboardItem: PasteboardItem {
+        [UTType.png.identifier: .data(png), UTType.tiff.identifier: .data(tiff)]
     }
-    #else
-    /// The image as one pasteboard item, by type identifier.
-    var pasteboardItem: [String: Any] {
-        [UTType.png.identifier: png, UTType.tiff.identifier: tiff]
-    }
-    #endif
 }
 
 public enum PasteboardWriter {
@@ -46,23 +37,13 @@ public enum PasteboardWriter {
 
     /// Replaces the pasteboard's contents with one item per image.
     @MainActor
-    public static func write(_ images: [PasteboardImage], to pasteboard: SystemPasteboard) {
-        #if os(macOS)
-        pasteboard.clearContents()
-        pasteboard.writeObjects(images.map(\.pasteboardItem))
-        #else
-        pasteboard.items = images.map(\.pasteboardItem)
-        #endif
+    public static func write(_ images: [PasteboardImage], to pasteboard: any Pasteboard) {
+        pasteboard.replaceContents(with: images.map(\.pasteboardItem))
     }
 
     /// Replaces the pasteboard's contents with a plain string.
     @MainActor
-    public static func write(_ text: String, to pasteboard: SystemPasteboard) {
-        #if os(macOS)
-        pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
-        #else
-        pasteboard.string = text
-        #endif
+    public static func write(_ text: String, to pasteboard: any Pasteboard) {
+        pasteboard.replaceContents(with: [[UTType.utf8PlainText.identifier: .text(text)]])
     }
 }

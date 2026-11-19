@@ -165,15 +165,13 @@ struct PluckModelTests {
         try await openSample()
         model.selectedImageIDs = Set(model.visibleImages.map(\.id))
         model.selectedPages = [1]
-        let pasteboard = NSPasteboard.withUniqueName()
-        defer { pasteboard.releaseGlobally() }
+        let pasteboard = MemoryPasteboard()
 
         try await model.copySelection(to: pasteboard)
 
-        let items = try #require(pasteboard.pasteboardItems)
-        #expect(items.count == 2)
-        #expect(items.allSatisfy { $0.types.contains(.png) && $0.types.contains(.tiff) })
-        let translucent = try RasterImage(encodedData: try #require(items[1].data(forType: .png)))
+        #expect(pasteboard.items.count == 2)
+        #expect(pasteboard.items.allSatisfy { Set($0.keys) == ["public.png", "public.tiff"] })
+        let translucent = try RasterImage(encodedData: try #require(pasteboard.data("public.png", item: 1)))
         #expect(translucent.pixel(0, 0) == Color.red + [128])
         #expect(model.statusMessage == "Copied 2 images")
     }
