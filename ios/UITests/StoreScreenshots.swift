@@ -25,6 +25,18 @@ final class StoreScreenshots: PluckUITestCase {
         try save("2-selected")
     }
 
+    /// The text of the PDF, with its stat blocks found.
+    func testText() throws {
+        let pdf = ProcessInfo.processInfo.environment["STORE_PDF"] ?? ""
+        try XCTSkipIf(pdf.isEmpty, "Set STORE_PDF to the PDF to show.")
+        app.launchEnvironment["UITestSampleFile"] = pdf
+        launch(.portrait)
+        XCTAssertTrue(status("4 images").waitForExistence(timeout: 60), app.debugDescription)
+        app.buttons["Text"].tap()
+        Thread.sleep(forTimeInterval: 3)
+        try save("3-text")
+    }
+
     private func save(_ name: String) throws {
         Thread.sleep(forTimeInterval: 1.5)
         let file = folder.appendingPathComponent("\(name).png")
