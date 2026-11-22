@@ -6,9 +6,11 @@ import UIKit
 /// transparent background; page 2 has a paragraph and a third picture.
 enum UITestSample {
     static let argument = "-UITestSample"
+    static let fileVariable = "UITestSampleFile"
     private static let page = CGRect(x: 0, y: 0, width: 612, height: 792)
 
     static func urlIfRequested() -> URL? {
+        if let file = ProcessInfo.processInfo.environment[fileVariable] { return copyOfFile(at: file) }
         guard ProcessInfo.processInfo.arguments.contains(argument) else { return nil }
         let url = FileManager.default.temporaryDirectory.appending(path: "UI Test Sample.pdf")
         do {
@@ -17,6 +19,14 @@ enum UITestSample {
         } catch {
             return nil
         }
+    }
+
+    /// A PDF from outside the app, for the store's screenshots (`UITestSampleFile`).
+    private static func copyOfFile(at path: String) -> URL? {
+        let source = URL(fileURLWithPath: path)
+        let copy = FileManager.default.temporaryDirectory.appending(path: source.lastPathComponent)
+        try? FileManager.default.removeItem(at: copy)
+        return (try? FileManager.default.copyItem(at: source, to: copy)) == nil ? nil : copy
     }
 
     private static func draw(_ context: UIGraphicsPDFRendererContext) {
