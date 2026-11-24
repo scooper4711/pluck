@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: scooper4711/tabletop-kit
-          ref: a27d4212bcca79dbe47b66d438e282c3edecfc86 # tabletop-kit v1.17.0
+          ref: ec2f854ebc4cdd5f556fcecbd7989571f99c002d # tabletop-kit v1.18.0
           path: .store-tools
           persist-credentials: false
 
