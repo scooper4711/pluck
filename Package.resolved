@@ -1,5 +1,5 @@
 {
-  "originHash" : "30e709687a75eb1fdfb11fbfcfa85a871ba085176a0f245d2b959c179d77fa48",
+  "originHash" : "239fb40a7497752dd9054ef5fa6bf2d13ed5929dab65ad713cc9204b07f1bb97",
   "pins" : [
     {
       "identity" : "libwebp-xcode",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scooper4711/tabletop-kit.git",
       "state" : {
-        "revision" : "67efcbb666d60552bb0dd3dc0ae40d4aeaa29eac",
-        "version" : "1.20.0"
+        "revision" : "6975c73c519508f4930d9a6ef5a04f2f98ffe7e2",
+        "version" : "1.21.0"
       }
     }
   ],
