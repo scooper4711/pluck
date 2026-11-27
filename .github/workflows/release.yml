@@ -15,6 +15,10 @@ jobs:
   dmg:
     name: Build and attach the disk image
     runs-on: macos-26
+    # The Developer ID certificate and the notary login are secrets of the developer-id Environment, which only main
+    # and v* tags can use, so no pull request's workflow can read them. A trial build of another branch runs without
+    # the Environment and is signed ad hoc.
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'developer-id' || '' }}
     env:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ github.ref_name }}
