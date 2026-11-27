@@ -1,6 +1,8 @@
 #!/bin/sh
 # Runs the iPad UI tests in a simulator. They screenshot the window in landscape and portrait; the screenshots are
-# kept in the test results (ios/build/Logs/Test).
+# kept in the run's result bundle, ios/build/UITests.xcresult, with each test's screen recording. When the run fails,
+# xcodebuild's own reasons are printed: a test that never reports, because the app or the runner died, is named only
+# there.
 #
 # Each run drives a simulator of its own: a copy of the one chosen, erased first and deleted afterward. A simulator
 # that is used again keeps what earlier runs saved, and the CI Macs run several jobs at once, which would otherwise
@@ -44,9 +46,16 @@ trap 'exit 1' INT TERM
 
 set -- -project ios/Pluck.xcodeproj -scheme Pluck-iPad \
     -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO
+RESULT=ios/build/UITests.xcresult
+rm -rf "$RESULT"
+set -- "$@" -resultBundlePath "$RESULT"
 for test in ${ONLY:-}; do set -- "$@" -only-testing:"PluckUITests/$test"; done
 
 STATUS=0
 xcodebuild test "$@" > "$LOG" 2>&1 || STATUS=$?
 grep -E " error: |Test Case .*(passed|failed)|\*\* TEST" "$LOG" || tail -n 20 "$LOG"
+if [ "$STATUS" -ne 0 ]; then
+    echo "Why the run failed, as xcodebuild tells it:"
+    sed -n '/^Failing tests:/,/^\*\* TEST/p; /^Testing failed:/,/^\*\* TEST/p' "$LOG" | head -n 60
+fi
 exit "$STATUS"
