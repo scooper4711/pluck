@@ -18,7 +18,7 @@ jobs:
     # The Mac mini runs our own builds; pull requests from forks stay on GitHub's machines, since this is a public
     # repository and a self-hosted runner would run a stranger's code on the mini.
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'macos-26' || 'mac-mini' }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -44,6 +44,18 @@ jobs:
 
       - name: Build the app bundle
         run: scripts/build-app.sh
+
+      # Builds the iPad app and runs its UI tests, in a Simulator the CI Mac keeps booted (see the script).
+      - name: Run the iPad UI tests
+        run: scripts/run-ipad-uitests.sh
+
+      - name: Keep the UI test results
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ui-test-results
+          path: ios/build/UITests.xcresult
+          retention-days: 7
 
   sonar:
     name: SonarCloud Analysis
